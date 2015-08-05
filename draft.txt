@@ -1,0 +1,11 @@
+household attributes
+    identifier (household head)
+
+
+household properties
+    people
+    estate
+    vehicles
+    accounts
+    other
+
