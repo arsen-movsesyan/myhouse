@@ -1,0 +1,144 @@
+html, body {
+    margin:0px;
+    padding:0px;
+}
+
+body, input, select, textarea {
+    background-color: #ffffff;
+}
+
+table.main {
+    width: 100%;
+    height: 100%;
+}
+
+
+table {
+    border-collapse: collapse;
+
+}
+
+tr.divider td {
+    border: 0;
+    height: 40px;
+}
+
+
+td {
+    padding: 0px;
+    height: 18px;
+}
+
+td, input, select, textarea, th {
+    font-family: Tahoma;
+    font-size: 12px;
+    font-weight: normal;
+    vertical-align: top;
+}
+/*
+============================================================
+
+*/
+
+
+td.logo {
+    width: 16%;
+}
+
+td.config {
+    width: 14%;
+}
+
+/*
+============================================================
+*/
+
+td.item_list {
+    padding-left: 20px;
+    height: 100%;
+}
+
+/*
+td.search {
+    vertical-align: bottom;
+}
+*/
+
+
+
+
+
+td.small_header {
+    font-weight: bold;
+    text-align: center;
+}
+
+td.big_header {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+}
+
+td.wide {
+    width: 120px;
+    text-align: center;
+}
+
+
+
+
+
+td.menuitem {
+    vertical-align: middle;
+    text-align: center;
+    width: 9%;
+    height: 34px;
+}
+
+
+td.shaded {
+    width: 180px;
+    background-color: #DDDDDD;
+    color: #DDDDDD;
+    text-align: center;
+    vertical-align: center;
+}
+
+
+
+a:visited {
+    color: blue;
+}
+
+a.noticable {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+
+a.menu {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #5555BB;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a.navigate_menu {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #5555BB;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a.edit_item {
+    color: #5555BB;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+

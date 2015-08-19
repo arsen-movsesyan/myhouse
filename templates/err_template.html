@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block search %}
+{% endblock %}
+
+{% block main_info %}
+
+{% for field in form %}
+
+    {% if field.errors %}
+	{{ field.label_tag }} {{ field.errors }}
+    {% endif %}
+
+{% endfor %}
+
+{% endblock %}
