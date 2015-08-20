@@ -20,6 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+PROJECT_VERSION = 1
+
 SECRET_KEY = 'npql-8sp0wae3z#a(0a1+-a8*78j2s@9kj3o*se02hq05_uey)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -78,7 +80,7 @@ WSGI_APPLICATION = 'myhouse.wsgi.application'
 DATABASES = {
     'default': {
 	'ENGINE': 'django.db.backends.postgresql_psycopg2',
-	'NAME': 'py_household',
+	'NAME': 'myhouse',
 	'USER': 'postgres',
 	'HOST': 'localhost',
 	'PORT': 5432,
@@ -108,3 +110,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'),
 )
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'

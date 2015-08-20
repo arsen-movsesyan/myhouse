@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 
+{% block config %}
+<div>
+<br>
+<a class="menu" href="/login">Login</a><br>
+<a class="menu" href="/register">Register</a>
+</div>
+{% endblock %}
+
 {% block search %}
 {% endblock %}
 
+
+
+{% block main_menu %}{% endblock %}
 {% block main_info %}
 
 {% for field in form %}
