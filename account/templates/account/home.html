@@ -1,5 +1,5 @@
 
-{% extends "base.html" %}
+{% extends "account/base.html" %}
 
 {% block config %}
 <div>
@@ -11,8 +11,28 @@
 
 
 {% block main_info %}
+Welcome
 
-<br>
-Welcome<br>
+{% if not h_user %}
+    <br>Please provide information about you<br>
+
+<form method="post">
+{% csrf_token %}
+<table border=0>
+
+{{ h_user_form.as_table }}
+
+<tr>
+    <td colspan=2 align="center">
+<input type="submit" value="Submit">
+    </td>
+</tr>
+
+</table>
+</form>
+{% else %}
+ {{ h_user.user.first_name }}
+{% endif %}
+
 {% endblock %}
 
