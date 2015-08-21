@@ -41,7 +41,7 @@ class HouseUserForm(ModelForm):
 
     class Meta:
 	model = HouseUser
-	fields = ['dob','sex','mh_superuser']
+	fields = ['dob','sex']
 
     def clean(self):
 	cleaned_data = super(HouseUserForm,self).clean()

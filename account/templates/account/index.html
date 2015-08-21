@@ -10,10 +10,14 @@
 </div>
 {% endblock %}
 
-{% block main_menu %}Main Menu{% endblock %}
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
 {% block main_info %}
 
 <br>
 Starting page
 <br>
+
 {% endblock %}
