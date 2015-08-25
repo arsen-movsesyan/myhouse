@@ -35,36 +35,56 @@ td, input, select, textarea, th {
     font-weight: normal;
     vertical-align: top;
 }
+
 /*
 ============================================================
-
 */
-
 
 td.logo {
     width: 16%;
+    height: 70px;
+}
+
+td.top_info {
 }
 
 td.config {
     width: 14%;
 }
 
-/*
-============================================================
-*/
+td.search {
+    height: 34px;
+}
 
-td.item_list {
-    padding-left: 20px;
+td.top_menu {
+}
+
+td.reserved {
+}
+
+td.navigate {
+/*    padding-left: 20px; */
     height: 100%;
 }
 
-/*
-td.search {
-    vertical-align: bottom;
+td.main_info {
 }
+
+td.right_pan {
+}
+
+td.copyright {
+}
+
+td.bottom_stripe {
+}
+
+td.reserved_corner {
+}
+
+/*
+============================================================
 */
-
-
 
 
 
@@ -93,7 +113,7 @@ td.menuitem {
     vertical-align: middle;
     text-align: center;
     width: 9%;
-    height: 34px;
+/*    height: 34px; */
 }
 
 

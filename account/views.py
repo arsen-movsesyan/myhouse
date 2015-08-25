@@ -177,3 +177,14 @@ def view_household(request):
 	    template = 'account/create_household.html'
 	    context = {'form':hh_form}
 	    return render(request,template,context)
+
+
+@login_required
+def view_users(request):
+    template = loader.get_template('account/view_users.html')
+    return HttpResponse(template.render())
+
+@login_required
+def view_addresses(request):
+    template = loader.get_template('account/view_addresses.html')
+    return HttpResponse(template.render())

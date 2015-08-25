@@ -34,8 +34,9 @@ class Household(models.Model):
 	managed = False
 	db_table = "mh_{0}_account_household".format(settings.PROJECT_VERSION)
 
-    def generate_unique_code(self):
-	pass
+#    def generate_unique_code(self):
+#	if not self.unique_code:
+	    
 
 
 class HouseUser(models.Model):
