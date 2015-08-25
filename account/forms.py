@@ -2,7 +2,8 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
 
-from account.models import HouseUser
+from account.models import HouseUser,BasicAddress
+
 import re
 
 
@@ -52,3 +53,12 @@ class HouseUserForm(ModelForm):
 	    self.cleaned_data['ssn_13'] = complete_ssn[0:3]
 	    self.cleaned_data['ssn_45'] = complete_ssn[4:6]
 	    self.cleaned_data['ssn_69'] = complete_ssn[7:11]
+
+
+
+class AddressForm(ModelForm):
+
+    class Meta:
+	model = BasicAddress
+	fields = ['str_line_1','str_line_2','appt_unit','city','state','zip_code','country']
+
