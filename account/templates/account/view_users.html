@@ -8,20 +8,7 @@
 {% endblock %}
 
 {% block main_info %}
-Welcome
-
-{% if not h_user %}
-    <br>Please provide information about you<br>
-{#    {% include "account/user_info_form.html" %} #}
-
-{% else %}
- {{ h_user.user.first_name }}
-{% endif %}
-
-{% include "account/user_info_form.html" %}
-
-
-
+User management
 
 {% endblock %}
 

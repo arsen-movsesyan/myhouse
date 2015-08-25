@@ -1,8 +1,15 @@
-{% extends "base.html" %}
+{% extends "account/base.html" %}
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
 
 {% block search %}
 {% endblock %}
 
+
+
+{% block main_menu %}{% endblock %}
 {% block main_info %}
 
 {% for field in form %}
