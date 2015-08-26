@@ -26,7 +26,7 @@ class BasicAddress(models.Model):
 
 class Household(models.Model):
     id = models.AutoField(primary_key=True)
-    ba_id = models.ForeignKey(BasicAddress,related_name='main_household',db_column='ba_id')
+    ba = models.ForeignKey(BasicAddress,related_name='main_household',db_column='ba_id')
     create_date = models.DateField(auto_now_add=True)
     unique_code = None
 
@@ -40,10 +40,16 @@ class Household(models.Model):
 
 
 class HouseUser(models.Model):
-    HUMAN_SEX = [
-		('MALE',"Male"),
-		('FEMALE',"Female"),
-		('PREFER_NOT_TO_SAY',"Prefer not to say")]
+    HUMAN_SEX = [('MALE',"Male"),('FEMALE',"Female")]
+    HUMAN_TITLE = [
+	('MR','Mr.'),
+	('MRS','Mrs.'),
+	('MS','Ms.'),
+    ]
+    HUMAN_SUFFIX = [
+	('SR','Senior'),
+	('JR','Junior'),
+    ]
 
     user_id = models.OneToOneField(settings.AUTH_USER_MODEL,
 	    db_column='user_id',
@@ -56,6 +62,11 @@ class HouseUser(models.Model):
     ssn_69 = models.CharField(max_length=4,blank=False)
     mh_superuser = models.BooleanField(default=False) #In addition to "is_superuser" this is for household admin
     sex =  models.CharField(max_length=255,choices=HUMAN_SEX,blank=False)
+    first_name = models.CharField(max_length=255,blank=False)
+    last_name = models.CharField(max_length=255,blank=False)
+    email = models.EmailField(max_length=255,blank=False)
+    title = models.CharField(max_length=255,choices=HUMAN_TITLE,blank=True)
+    suffix = models.CharField(max_length=255,choices=HUMAN_SUFFIX,blank=True)
     complete_ssn = None
 
     class Meta:
@@ -72,14 +83,9 @@ class HouseUser(models.Model):
 
 
 class MapUserHousehold(models.Model):
-    user_id = models.OneToOneField('HouseUser',
-	    db_column='user_id',
-	    primary_key=True,
-	    related_name='map_to_household')
-    household = models.ForeignKey('Household',
-	    related_name='map_to_household')
-    assign_time = models.DateTimeField(auto_now_add=True)
-    self_created = models.BooleanField()
+    user_id = models.OneToOneField('HouseUser',db_column='user_id',primary_key=True
+	,related_name='to_household')
+    household = models.ForeignKey('Household',related_name='belong_users')
 
     class Meta:
 	managed = False
