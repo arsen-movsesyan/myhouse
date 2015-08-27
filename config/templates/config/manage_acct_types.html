@@ -1,0 +1,28 @@
+
+{% extends "account/base.html" %}
+
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block main_info %}
+
+<a href="/config/add_acct_type">Add New Type</a>
+<br><br>
+
+<table border="1">
+{% for type in types %}
+    <tr>
+	<td>{{ type.type_name }}</td>
+	<td>{{ type.brief }}</td>
+	<td>{{ type.description }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+{% endblock %}

@@ -51,11 +51,11 @@ class HouseUser(models.Model):
 	('JR','Junior'),
     ]
 
-    user_id = models.OneToOneField(settings.AUTH_USER_MODEL,
+    auth_user = models.OneToOneField(settings.AUTH_USER_MODEL,
 	    db_column='user_id',
 	    related_name='house_user',
 	    primary_key=True)
-
+    created_by = models.IntegerField(blank=False)
     dob = models.DateField()
     ssn_13 = models.CharField(max_length=3,blank=False)
     ssn_45 = models.CharField(max_length=2,blank=False)
@@ -67,6 +67,8 @@ class HouseUser(models.Model):
     email = models.EmailField(max_length=255,blank=False)
     title = models.CharField(max_length=255,choices=HUMAN_TITLE,blank=True)
     suffix = models.CharField(max_length=255,choices=HUMAN_SUFFIX,blank=True)
+    disabled = models.BooleanField(default=False)
+    disabled_at = models.DateField()
     complete_ssn = None
 
     class Meta:
@@ -83,7 +85,7 @@ class HouseUser(models.Model):
 
 
 class MapUserHousehold(models.Model):
-    user_id = models.OneToOneField('HouseUser',db_column='user_id',primary_key=True
+    user = models.OneToOneField('HouseUser',db_column='user_id',primary_key=True
 	,related_name='to_household')
     household = models.ForeignKey('Household',related_name='belong_users')
 

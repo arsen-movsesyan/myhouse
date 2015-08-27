@@ -1,0 +1,20 @@
+
+{% extends "account/base.html" %}
+
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block main_info %}
+
+<table border="1">
+    <tr>
+	<td><a href="/config/acct_type">Account Type</a></td>
+    </tr>
+</table>
+{% endblock %}

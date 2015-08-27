@@ -10,9 +10,28 @@
 {% block main_info %}
 <a href="add_user">Add New User</a><br><br>
 
-{% for user in users %}
-    {{ user }}<br>
+<table border="1">
+    <tr>
+	<td>First Name</td>
+	<td>Last Name</td>
+	<td>DOB</td>
+	<td>SSN</td>
+	<td>Can Login</td>
+	<td>Actions</td>
+{% for person in persons %}
+    <tr>
+	<td>{{ person.first_name }}</td>
+	<td>{{ person.last_name }}</td>
+	<td>{{ person.dob }}</td>
+	<td>{{ person.ssn_13 }}</td>
+	<td>{{ person.auth_user.is_active }}</td>
+	<td>
+	    <a href="edit_user/{{ person.auth_user_id }}">Edit</a>
+	    <a href="delete_user/{{ person.auth_user_id }}">Delete</a>
+	</td>
+    </tr>
 {% endfor %}
+</table>
 {% endblock %}
 
 {% block right_pan %}

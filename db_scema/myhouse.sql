@@ -337,6 +337,42 @@ CREATE TABLE django_session (
 ALTER TABLE django_session OWNER TO postgres;
 
 --
+-- Name: mh_1_account_account; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_account_account (
+    id integer NOT NULL,
+    acct_name character varying NOT NULL,
+    create_date date DEFAULT (now())::date NOT NULL,
+    created_by integer NOT NULL,
+    login_url character varying NOT NULL
+);
+
+
+ALTER TABLE mh_1_account_account OWNER TO postgres;
+
+--
+-- Name: mh_1_account_account_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_account_account_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_account_account_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_account_account_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_account_account_id_seq OWNED BY mh_1_account_account.id;
+
+
+--
 -- Name: mh_1_account_basic_address; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -365,7 +401,15 @@ CREATE TABLE mh_1_account_house_user (
     ssn_45 character(2) NOT NULL,
     ssn_69 character(4) NOT NULL,
     mh_superuser boolean DEFAULT false NOT NULL,
-    sex human_sex NOT NULL
+    sex human_sex NOT NULL,
+    first_name character varying NOT NULL,
+    last_name character varying NOT NULL,
+    email character varying NOT NULL,
+    title character varying,
+    suffix character varying,
+    created_by integer NOT NULL,
+    disabled boolean DEFAULT false NOT NULL,
+    disabled_at date
 );
 
 
@@ -390,9 +434,7 @@ ALTER TABLE mh_1_account_household OWNER TO postgres;
 
 CREATE TABLE mh_1_account_map_user_household (
     user_id integer NOT NULL,
-    household_id integer NOT NULL,
-    assign_time timestamp without time zone DEFAULT now() NOT NULL,
-    self_created boolean DEFAULT false NOT NULL
+    household_id integer NOT NULL
 );
 
 
@@ -438,6 +480,41 @@ ALTER TABLE mh_1_common_main_house_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE mh_1_common_main_house_id_seq OWNED BY mh_1_account_household.id;
+
+
+--
+-- Name: mh_1_config_accttype; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_accttype (
+    id integer NOT NULL,
+    type_name character varying NOT NULL,
+    brief character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE mh_1_config_accttype OWNER TO postgres;
+
+--
+-- Name: mh_1_config_accttype_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_accttype_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_accttype_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_accttype_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_accttype_id_seq OWNED BY mh_1_config_accttype.id;
 
 
 --
@@ -500,6 +577,13 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
+ALTER TABLE ONLY mh_1_account_account ALTER COLUMN id SET DEFAULT nextval('mh_1_account_account_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
 ALTER TABLE ONLY mh_1_account_basic_address ALTER COLUMN id SET DEFAULT nextval('mh_1_common_basic_address_id_seq'::regclass);
 
 
@@ -508,6 +592,13 @@ ALTER TABLE ONLY mh_1_account_basic_address ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY mh_1_account_household ALTER COLUMN id SET DEFAULT nextval('mh_1_common_main_house_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_accttype ALTER COLUMN id SET DEFAULT nextval('mh_1_config_accttype_id_seq'::regclass);
 
 
 --
@@ -587,7 +678,8 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-10	pbkdf2_sha256$20000$OXDmyVzy0mzD$IMzjWlz4BuhN+G36mvB+1GE5C0kfaQGIuxNgHrgVPco=	2015-08-24 15:29:14.763709-07	f	arsen@kuku.com	Arsen	Movsesyan	arsen@kuku.com	f	t	2015-08-19 14:58:48.909891-07
+13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-26 12:47:28.244234-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
+19	pbkdf2_sha256$20000$boYmVdIvkNTd$OFVUB5jUJGRthe/XBXv3PQ3iOs6p/oSd+CBrQ4yIl+U=	\N	f	koryun@test.com			koryun@test.com	f	t	2015-08-26 14:33:58.75687-07
 \.
 
 
@@ -610,7 +702,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 10, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 19, true);
 
 
 --
@@ -686,8 +778,23 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 14, true);
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-bmz8zloq4jam7ev0obdwytc0fsievf0f	OWJhNDI2NTVlNGI5MWZiZmJjZDVkNjBiNjg2ZjQ2NTg3Y2UwOWFmZDp7Il9hdXRoX3VzZXJfaGFzaCI6IjFjZDAzMDdmZjY2ZDUxMjcwMzdkNjA3YWVmZmI2MzczMWIwODJmYzciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMCJ9	2015-09-07 15:29:14.76602-07
+90j5rcsa1iee8o7mskgt6ovjbl3nclq9	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-09 14:47:46.40583-07
 \.
+
+
+--
+-- Data for Name: mh_1_account_account; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url) FROM stdin;
+\.
+
+
+--
+-- Name: mh_1_account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_account_account_id_seq', 1, false);
 
 
 --
@@ -695,7 +802,7 @@ bmz8zloq4jam7ev0obdwytc0fsievf0f	OWJhNDI2NTVlNGI5MWZiZmJjZDVkNjBiNjg2ZjQ2NTg3Y2U
 --
 
 COPY mh_1_account_basic_address (id, str_line_1, city, state, zip_code, country, str_line_2, appt_unit) FROM stdin;
-4	5450 Cahalan Ave	San Jose	CA	95123	USA		
+5	5450 Cahalan Ave	San Jose	CA	95123	USA		
 \.
 
 
@@ -703,8 +810,9 @@ COPY mh_1_account_basic_address (id, str_line_1, city, state, zip_code, country,
 -- Data for Name: mh_1_account_house_user; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, mh_superuser, sex) FROM stdin;
-10	1970-02-21	123	45	6789	f	MALE
+COPY mh_1_account_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, mh_superuser, sex, first_name, last_name, email, title, suffix, created_by, disabled, disabled_at) FROM stdin;
+13	1970-02-21	123	45	6789	t	MALE	Arsen	Movsesyan	arsen@test.com	MR		13	f	\N
+19	1994-05-03	123	45	6789	f	MALE	Koryun	Movsesyan	koryun@test.com	MR		13	f	\N
 \.
 
 
@@ -713,7 +821,7 @@ COPY mh_1_account_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, mh_superuser
 --
 
 COPY mh_1_account_household (id, ba_id, create_date) FROM stdin;
-3	4	2015-08-24
+4	5	2015-08-25
 \.
 
 
@@ -721,8 +829,8 @@ COPY mh_1_account_household (id, ba_id, create_date) FROM stdin;
 -- Data for Name: mh_1_account_map_user_household; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_map_user_household (user_id, household_id, assign_time, self_created) FROM stdin;
-10	3	2015-08-24 22:25:33.183196	t
+COPY mh_1_account_map_user_household (user_id, household_id) FROM stdin;
+13	4
 \.
 
 
@@ -730,14 +838,29 @@ COPY mh_1_account_map_user_household (user_id, household_id, assign_time, self_c
 -- Name: mh_1_common_basic_address_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_common_basic_address_id_seq', 4, true);
+SELECT pg_catalog.setval('mh_1_common_basic_address_id_seq', 5, true);
 
 
 --
 -- Name: mh_1_common_main_house_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_common_main_house_id_seq', 3, true);
+SELECT pg_catalog.setval('mh_1_common_main_house_id_seq', 4, true);
+
+
+--
+-- Data for Name: mh_1_config_accttype; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_accttype (id, type_name, brief, description) FROM stdin;
+\.
+
+
+--
+-- Name: mh_1_config_accttype_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 1, false);
 
 
 --
@@ -869,6 +992,14 @@ ALTER TABLE ONLY django_session
 
 
 --
+-- Name: mh_1_account_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_account_account
+    ADD CONSTRAINT mh_1_account_account_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: mh_1_account_map_user_household_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -898,6 +1029,14 @@ ALTER TABLE ONLY mh_1_account_basic_address
 
 ALTER TABLE ONLY mh_1_account_household
     ADD CONSTRAINT mh_1_common_main_house_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_config_accttype_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_accttype
+    ADD CONSTRAINT mh_1_config_accttype_pkey PRIMARY KEY (id);
 
 
 --

@@ -7,5 +7,6 @@ urlpatterns = [
     url(r'^login','account.views.log_in'),
     url(r'^logout','account.views.log_out'),
     url(r'^account/',include('account.urls')),
+    url(r'^config/',include('config.urls')),
 #    url(r'^admin/', include(admin.site.urls)),
 ]
