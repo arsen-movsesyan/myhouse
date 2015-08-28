@@ -2,6 +2,14 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
 
+from config.models import AccountType
+
+
+class AddEditAccountTypeForm(ModelForm):
+
+    class Meta:
+	model = AccountType
+	fields = ['type_name','brief','description']
 
 """
 

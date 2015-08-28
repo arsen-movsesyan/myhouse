@@ -10,11 +10,6 @@
     {{ block.super }}
 {% endblock %}
 
-{% block main_info %}
-
-<table border="1">
-    <tr>
-	<td><a href="/config/acct_type">Account Type</a></td>
-    </tr>
-</table>
+{% block navigate_menu %}
+    {% include "config/block_navigate_menu.html" %}
 {% endblock %}

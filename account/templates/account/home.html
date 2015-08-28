@@ -1,6 +1,8 @@
 {% extends "account/base.html" %}
 
 {% block config %}
+    {% include "account/block_config.html" %}
+{#    {{ block.super }} #}
 {% endblock %}
 
 {% block navigate_menu %}
@@ -8,7 +10,7 @@
 {% endblock %}
 
 {% block main_info %}
-Welcome {{ h_user.user.first_name }}
+Welcome {{ h_user.first_name }}
 
 {% endblock %}
 

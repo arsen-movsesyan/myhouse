@@ -3,7 +3,8 @@
 
 
 {% block config %}
-    {% include "account/block_config.html" %}
+    {{ block.super }}
+{#    {% include "account/block_config.html" %} #}
 {% endblock %}
 
 {% block main_menu %}

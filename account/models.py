@@ -83,6 +83,8 @@ class HouseUser(models.Model):
 	    return self.complete_ssn.replace('-','')
 	return self.complete_ssn
 
+    def __str__(self):
+	return "{0} {1}".format(self.first_name,self.last_name)
 
 class MapUserHousehold(models.Model):
     user = models.OneToOneField('HouseUser',db_column='user_id',primary_key=True
@@ -93,3 +95,15 @@ class MapUserHousehold(models.Model):
 	managed = False
 	db_table = "mh_{0}_account_map_user_household".format(settings.PROJECT_VERSION)
 
+
+class Account(models.Model):
+    id = models.AutoField(primary_key=True)
+    acct_name = models.CharField(max_length=255)
+    create_date = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey('HouseUser',db_column='created_by')
+    login_url = models.URLField()
+    acct_type = models.ForeignKey('config.AccountType')
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_account_account".format(settings.PROJECT_VERSION)

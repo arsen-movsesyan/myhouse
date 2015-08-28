@@ -145,6 +145,15 @@ a.menu {
     text-decoration: none;
 }
 
+a.small_menu {
+    font-size: 12px;
+    text-transform: lowercase;
+    color: #5555BB;
+/*    font-weight: bold; */
+    text-decoration: none;
+
+}
+
 a.navigate_menu {
     font-size: 12px;
     text-transform: uppercase;

@@ -11,8 +11,10 @@ from datetime import date
 
 
 from account.forms import CreateUserForm,LoginUserForm,AddEditUserForm,AddressForm
-from account.models import HouseUser,BasicAddress,Household,MapUserHousehold
+from account.forms import AddEditAccountForm
 
+from account.models import HouseUser,BasicAddress,Household,MapUserHousehold,Account
+from config.models import AccountType
 
 
 def _index(request):
@@ -270,7 +272,7 @@ def edit_person(request,in_user_id):
 	    return HttpResponseRedirect("/account/user_management")
 	else:
 	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':hh_form}))
+	    return HttpResponse(template.render({'form':in_form}))
 
     else:
 	template = "account/add_edit_user.html"
@@ -288,3 +290,36 @@ def delete_person(request,in_user_id):
     household_user.disabled_at = date.today()
     household_user.save()
     return HttpResponseRedirect("/account/user_management")
+
+@login_required
+def view_accounts(request):
+    template = loader.get_template("account/manage_accounts.html")
+    accounts = Account.objects.all()
+    context = {'all_accounts':accounts}
+    return HttpResponse(template.render(context))
+
+
+
+@login_required
+def add_account(request):
+    if request.method == 'POST':
+	in_form = AddEditAccountForm(request.POST)
+	if in_form.is_valid():
+#	    acct_type = AccountType.objects.get(pk=in_form.cleaned_data['acct_type'])
+	    acct_type = AccountType.objects.get(type_name=in_form.cleaned_data['acct_type'])
+	    new_acct = Account.objects.create(
+		acct_name = in_form.cleaned_data['acct_name'],
+		login_url = in_form.cleaned_data['login_url'],
+		created_by = request.user.id,
+		acct_type = acct_type
+	    )
+	    return HttpResponseRedirect("/account/account_management")
+	else:
+	    template = loader.get_template('account/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+
+    
+    template = "account/add_edit_account.html"
+    in_form = AddEditAccountForm()
+    context = {'form':in_form}
+    return render(request,template,context)

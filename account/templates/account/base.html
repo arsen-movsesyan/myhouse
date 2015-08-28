@@ -19,7 +19,13 @@
     {% include "account/block_top_info.html" %}
 {% endblock %}</td>
 	<td class="config">{% block config %}
-    {% include "account/block_config.html" %}
+<div>
+<br>
+<a class="menu" href="/login">Login</a><br>
+<a class="menu" href="/register">Register</a>
+</div>
+
+{#    {% include "account/block_config.html" %} #}
 {% endblock %}</td>
     </tr><tr>
 	<td class="search">{% block search %}
