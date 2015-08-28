@@ -345,7 +345,8 @@ CREATE TABLE mh_1_account_account (
     acct_name character varying NOT NULL,
     create_date date DEFAULT (now())::date NOT NULL,
     created_by integer NOT NULL,
-    login_url character varying NOT NULL
+    login_url character varying NOT NULL,
+    acct_type_id integer NOT NULL
 );
 
 
@@ -663,6 +664,12 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 34	Can add map user household	12	add_mapuserhousehold
 35	Can change map user household	12	change_mapuserhousehold
 36	Can delete map user household	12	delete_mapuserhousehold
+37	Can add account type	13	add_accounttype
+38	Can change account type	13	change_accounttype
+39	Can delete account type	13	delete_accounttype
+40	Can add account	14	add_account
+41	Can change account	14	change_account
+42	Can delete account	14	delete_account
 \.
 
 
@@ -670,7 +677,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 42, true);
 
 
 --
@@ -678,8 +685,8 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-26 12:47:28.244234-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
 19	pbkdf2_sha256$20000$boYmVdIvkNTd$OFVUB5jUJGRthe/XBXv3PQ3iOs6p/oSd+CBrQ4yIl+U=	\N	f	koryun@test.com			koryun@test.com	f	t	2015-08-26 14:33:58.75687-07
+13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-28 15:11:04.252579-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
 \.
 
 
@@ -734,6 +741,8 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 9	account	basicaddress
 11	account	household
 12	account	mapuserhousehold
+13	config	accounttype
+14	account	account
 \.
 
 
@@ -741,7 +750,7 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 12, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 14, true);
 
 
 --
@@ -763,6 +772,8 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 12	account	0003_auto_20150820_1138	2015-08-20 11:38:14.609585-07
 13	account	0004_household	2015-08-24 12:00:31.397876-07
 14	account	0005_mapuserhousehold	2015-08-24 12:26:33.317717-07
+15	config	0001_initial	2015-08-27 13:27:00.553158-07
+16	account	0006_account	2015-08-27 15:16:22.331634-07
 \.
 
 
@@ -770,7 +781,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 14, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 16, true);
 
 
 --
@@ -778,7 +789,8 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 14, true);
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-90j5rcsa1iee8o7mskgt6ovjbl3nclq9	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-09 14:47:46.40583-07
+iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
+lugiya9i5ncrg9ncq2htxxs6ww2bvhpm	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 15:11:37.067407-07
 \.
 
 
@@ -786,7 +798,8 @@ COPY django_session (session_key, session_data, expire_date) FROM stdin;
 -- Data for Name: mh_1_account_account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url) FROM stdin;
+COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id) FROM stdin;
+3	Google	2015-08-27	13	http://www.google.com	3
 \.
 
 
@@ -794,7 +807,7 @@ COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url) FR
 -- Name: mh_1_account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_account_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_account_account_id_seq', 3, true);
 
 
 --
@@ -853,6 +866,10 @@ SELECT pg_catalog.setval('mh_1_common_main_house_id_seq', 4, true);
 --
 
 COPY mh_1_config_accttype (id, type_name, brief, description) FROM stdin;
+1	Financial	Stores financial info	For all financial account types including banks, online stores and services required credit or debit card
+2	Social	For social networks	Accounts like "Facebook", "LinkedIn", etc.
+3	Basic	General Purpose accounts	
+4	Other	For all unclassified accounts	
 \.
 
 
@@ -860,7 +877,7 @@ COPY mh_1_config_accttype (id, type_name, brief, description) FROM stdin;
 -- Name: mh_1_config_accttype_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 4, true);
 
 
 --
@@ -1170,6 +1187,22 @@ ALTER TABLE ONLY auth_user_groups
 
 ALTER TABLE ONLY auth_user_user_permissions
     ADD CONSTRAINT auth_user_user_permiss_user_id_7f0938558328534a_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: mh_1_account_account_acct_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_account_account
+    ADD CONSTRAINT mh_1_account_account_acct_type_id_fkey FOREIGN KEY (acct_type_id) REFERENCES mh_1_config_accttype(id);
+
+
+--
+-- Name: mh_1_account_account_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_account_account
+    ADD CONSTRAINT mh_1_account_account_created_by_fkey FOREIGN KEY (created_by) REFERENCES mh_1_account_house_user(user_id);
 
 
 --
