@@ -178,7 +178,7 @@ def view_household(request):
 @login_required
 def view_persons(request):
     main_user=request.user.house_user
-    all_persons = HouseUser.objects.filter(created_by=request.user.id).filter(disabled = False)
+    all_persons = HouseUser.objects.filter(disabled=False)
     template = loader.get_template('account/view_users.html')
     context=dict()
     context['persons'] = all_persons
@@ -209,7 +209,8 @@ def add_person(request):
 		email,
 		password
 	    )
-	    auth_user.is_active = in_form.cleaned_data['login_enabled']
+#	    auth_user.is_active = in_form.cleaned_data['login_enabled']
+	    auth_user.is_active = False
 	    auth_user.save()
 	    ssn=in_form.cleaned_data['complete_ssn']
 	    household_user = HouseUser.objects.create(
@@ -217,7 +218,7 @@ def add_person(request):
 		created_by = request.user.id,
 		dob = in_form.cleaned_data['dob'],
 		sex = in_form.cleaned_data['sex'],
-		mh_superuser = in_form.cleaned_data['mh_superuser'],
+#		mh_superuser = in_form.cleaned_data['mh_superuser'],
 		ssn_13 = ssn[0:3],
 		ssn_45 = ssn[4:6],
 		ssn_69 = ssn[7:11],
@@ -252,13 +253,13 @@ def edit_person(request,in_user_id):
 
 	    auth_user.email = in_form.cleaned_data['email']
 	    auth_user.username = in_form.cleaned_data['email']
-	    auth_user.is_active = in_form.cleaned_data['login_enabled']
+#	    auth_user.is_active = in_form.cleaned_data['login_enabled']
 	    auth_user.save()
 
 	    ssn=in_form.cleaned_data['complete_ssn']
 	    household_user.dob = in_form.cleaned_data['dob'],
 	    household_user.sex = in_form.cleaned_data['sex'],
-	    household_user.mh_superuser = in_form.cleaned_data['mh_superuser'],
+#	    household_user.mh_superuser = in_form.cleaned_data['mh_superuser'],
 	    household_user.ssn_13 = ssn[0:3],
 	    household_user.ssn_45 = ssn[4:6],
 	    household_user.ssn_69 = ssn[7:11],
@@ -284,11 +285,14 @@ def edit_person(request,in_user_id):
 
 @login_required
 def delete_person(request,in_user_id):
-    auth_user = User.objects.get(pk=in_user_id)
-    household_user = auth_user.house_user
-    household_user.disabled = True
-    household_user.disabled_at = date.today()
-    household_user.save()
+    auth_user = request.user
+    user_to_delete = User.objects.get(pk=in_user_id)
+    if auth_user != user_to_delete:
+	user_to_delete.house_user.disabled = True
+	user_to_delete.house_user.disabled_at = date.today()
+	user_to_delete.house_user.save()
+	user_to_delete.house_user.delete()
+	user_to_delete.delete()
     return HttpResponseRedirect("/account/user_management")
 
 @login_required
@@ -321,5 +325,15 @@ def add_account(request):
     
     template = "account/add_edit_account.html"
     in_form = AddEditAccountForm()
+    context = {'form':in_form}
+    return render(request,template,context)
+
+@login_required
+def edit_account(request,in_acct_id):
+    if request.method == 'POST':
+	pass
+    account_obj = Account.objects.get(pk=in_acct_id)
+    template = "account/add_edit_account.html"
+    in_form = AddEditAccountForm(instance=account_obj)
     context = {'form':in_form}
     return render(request,template,context)

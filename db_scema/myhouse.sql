@@ -685,7 +685,6 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 42, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-19	pbkdf2_sha256$20000$boYmVdIvkNTd$OFVUB5jUJGRthe/XBXv3PQ3iOs6p/oSd+CBrQ4yIl+U=	\N	f	koryun@test.com			koryun@test.com	f	t	2015-08-26 14:33:58.75687-07
 13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-28 15:11:04.252579-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
 \.
 
@@ -790,7 +789,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 16, true);
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
-lugiya9i5ncrg9ncq2htxxs6ww2bvhpm	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 15:11:37.067407-07
+lugiya9i5ncrg9ncq2htxxs6ww2bvhpm	YTFkMzc1MGM4MGRhOWFkNDM0NmRmMWU4NTBjM2M1MWY1ZGE5YWYxZjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6IjEzIn0=	2015-09-11 16:00:13.716542-07
 \.
 
 
@@ -825,7 +824,6 @@ COPY mh_1_account_basic_address (id, str_line_1, city, state, zip_code, country,
 
 COPY mh_1_account_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, mh_superuser, sex, first_name, last_name, email, title, suffix, created_by, disabled, disabled_at) FROM stdin;
 13	1970-02-21	123	45	6789	t	MALE	Arsen	Movsesyan	arsen@test.com	MR		13	f	\N
-19	1994-05-03	123	45	6789	f	MALE	Koryun	Movsesyan	koryun@test.com	MR		13	f	\N
 \.
 
 

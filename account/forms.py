@@ -8,7 +8,7 @@ import re
 
 
 class CreateUserForm(ModelForm):
-    password = forms.CharField(label='Password',widget=forms.PasswordInput)
+#    password = forms.CharField(label='Password',widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirm Password',widget=forms.PasswordInput)
     confirm_email = forms.CharField(label='Confirm email')
     complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
@@ -25,11 +25,11 @@ class CreateUserForm(ModelForm):
 	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
 		self.add_error('complete_ssn',"Invalid ssn provided")
 
-	if 'password' in cleaned_data and 'confirm_password' in cleaned_data:
-	    password = cleaned_data['password']
-	    confirm_password = cleaned_data['confirm_password']
-	    if password != confirm_password:
-		self.add_error('confirm_password', "Password Confirmation mismatch")
+#	if 'password' in cleaned_data and 'confirm_password' in cleaned_data:
+#	    password = cleaned_data['password']
+#	    confirm_password = cleaned_data['confirm_password']
+#	    if password != confirm_password:
+#		self.add_error('confirm_password', "Password Confirmation mismatch")
 	if 'email' in cleaned_data and 'confirm_email' in cleaned_data:
 	    email = cleaned_data['email']
 	    confirm_email = cleaned_data['confirm_email']
@@ -54,12 +54,13 @@ class AddressForm(ModelForm):
 
 
 class AddEditUserForm(ModelForm):
-    login_enabled = forms.BooleanField(required=True)
+#    login_enabled = forms.BooleanField(required=True)
     complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
 
     class Meta:
 	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','dob','sex','email','mh_superuser']
+#	fields = ['title','first_name','last_name','suffix','dob','sex','email','mh_superuser']
+	fields = ['title','first_name','last_name','suffix','dob','sex','email']
 
     def clean(self):
 	cleaned_data = super(AddEditUserForm,self).clean()
