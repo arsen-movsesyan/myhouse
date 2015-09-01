@@ -1,5 +1,5 @@
 
-{% extends "account/base.html" %}
+{% extends "base/base.html" %}
 
 
 {% block config %}
@@ -16,22 +16,21 @@
 
 {% block main_info %}
 
-<a href="/config/acct_type/add_acct_type">Add New Type</a>
+<a href="/config/account/attributes/add">Add New Attribute</a>
 <br><br>
 
 <table border="1">
     <tr align="center">
 	<td><b>Name</b></td>
-	<td><b>Brief Info</b></td>
 	<td><b>Description</b></td>
     </tr>
 
 
-{% for acct_type in types %}
+{% for attr in attributes %}
     <tr>
-	<td><a href="edit_acct_type/{{ acct_type.id }}">{{ acct_type.type_name }}</a></td>
-	<td>{{ acct_type.brief }}</td>
-	<td>{{ acct_type.description }}</td>
+	<td>{{ attr.attribute_name }}</td>
+{#	<td><a href="edit/{{ acct_type.id }}">{{ attr.attribute_name }}</a></td> #}
+	<td>{{ attr.description }}</td>
     </tr>
 {% endfor %}
 

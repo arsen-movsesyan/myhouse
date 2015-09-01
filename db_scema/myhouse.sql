@@ -346,7 +346,12 @@ CREATE TABLE mh_1_account_account (
     create_date date DEFAULT (now())::date NOT NULL,
     created_by integer NOT NULL,
     login_url character varying NOT NULL,
-    acct_type_id integer NOT NULL
+    acct_type_id integer NOT NULL,
+    disabled boolean DEFAULT false NOT NULL,
+    disabled_date date,
+    time_watch boolean DEFAULT false NOT NULL,
+    access_login character varying,
+    access_password character varying
 );
 
 
@@ -484,6 +489,40 @@ ALTER SEQUENCE mh_1_common_main_house_id_seq OWNED BY mh_1_account_household.id;
 
 
 --
+-- Name: mh_1_config_acctattribute; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_acctattribute (
+    id integer NOT NULL,
+    attribute_name character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE mh_1_config_acctattribute OWNER TO postgres;
+
+--
+-- Name: mh_1_config_acctattribute_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_acctattribute_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_acctattribute_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_acctattribute_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_acctattribute_id_seq OWNED BY mh_1_config_acctattribute.id;
+
+
+--
 -- Name: mh_1_config_accttype; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -517,6 +556,20 @@ ALTER TABLE mh_1_config_accttype_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE mh_1_config_accttype_id_seq OWNED BY mh_1_config_accttype.id;
 
+
+--
+-- Name: mh_default_accttype; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_default_accttype (
+    id integer NOT NULL,
+    type_name character varying NOT NULL,
+    brief character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE mh_default_accttype OWNER TO postgres;
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
@@ -593,6 +646,13 @@ ALTER TABLE ONLY mh_1_account_basic_address ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY mh_1_account_household ALTER COLUMN id SET DEFAULT nextval('mh_1_common_main_house_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_acctattribute ALTER COLUMN id SET DEFAULT nextval('mh_1_config_acctattribute_id_seq'::regclass);
 
 
 --
@@ -685,7 +745,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 42, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-28 15:11:04.252579-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
+13	pbkdf2_sha256$20000$vUxWt9W6mRJR$0FWpf3jkmET7y5OVd8kX1cPiWskwsIGB/pJ0NsbzgoM=	2015-08-31 15:29:25.576326-07	f	arsen@test.com			arsen@test.com	f	t	2015-08-25 14:16:08.766726-07
 \.
 
 
@@ -789,7 +849,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 16, true);
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
-lugiya9i5ncrg9ncq2htxxs6ww2bvhpm	YTFkMzc1MGM4MGRhOWFkNDM0NmRmMWU4NTBjM2M1MWY1ZGE5YWYxZjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6IjEzIn0=	2015-09-11 16:00:13.716542-07
+3u1xnzkh7ky87awcd4btraics37ex1ej	NTQyYWE0MmQ2YTAzNmE0OTg5MjJmYzk1YWYxNTNiMmIwMjhkOWYzOTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU3NzM0NTljOTAxNDQ5YjdhN2YyMzA4ZDI1Njg5MjVmMDBkOTU2Y2QiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyJ9	2015-09-14 15:29:25.579558-07
 \.
 
 
@@ -797,8 +857,11 @@ lugiya9i5ncrg9ncq2htxxs6ww2bvhpm	YTFkMzc1MGM4MGRhOWFkNDM0NmRmMWU4NTBjM2M1MWY1ZGE
 -- Data for Name: mh_1_account_account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id) FROM stdin;
-3	Google	2015-08-27	13	http://www.google.com	3
+COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id, disabled, disabled_date, time_watch, access_login, access_password) FROM stdin;
+4	Yahoo	2015-08-31	13	http://www.yahoo.com	2	f	\N	f	\N	\N
+5	LinkedIn	2015-08-31	13	http://www.linkedin.com	2	f	\N	f	\N	\N
+3	Google	2015-08-27	13	http://www.google.com	3	f	\N	f	arsen	kukublin
+6	MyBank	2015-08-31	13	http://www.chase.com	1	t	2015-08-31	f		
 \.
 
 
@@ -806,7 +869,7 @@ COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, ac
 -- Name: mh_1_account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_account_id_seq', 3, true);
+SELECT pg_catalog.setval('mh_1_account_account_id_seq', 6, true);
 
 
 --
@@ -860,6 +923,24 @@ SELECT pg_catalog.setval('mh_1_common_main_house_id_seq', 4, true);
 
 
 --
+-- Data for Name: mh_1_config_acctattribute; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_acctattribute (id, attribute_name, description) FROM stdin;
+1	Account Number	For basic banking account numbers
+2	Routing Number	Banking Routing numbers
+3	Confirmation	For general purpose confirmations
+\.
+
+
+--
+-- Name: mh_1_config_acctattribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_acctattribute_id_seq', 3, true);
+
+
+--
 -- Data for Name: mh_1_config_accttype; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -876,6 +957,18 @@ COPY mh_1_config_accttype (id, type_name, brief, description) FROM stdin;
 --
 
 SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 4, true);
+
+
+--
+-- Data for Name: mh_default_accttype; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_default_accttype (id, type_name, brief, description) FROM stdin;
+1	Financial	Stores financial info	For all financial account types including banks, online stores and services required credit or debit card
+2	Social	For social networks	Accounts like "Facebook", "LinkedIn", etc.
+3	Basic	General Purpose accounts	
+4	Other	For all unclassified accounts	
+\.
 
 
 --
@@ -1047,11 +1140,27 @@ ALTER TABLE ONLY mh_1_account_household
 
 
 --
+-- Name: mh_1_config_acctattribute_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_acctattribute
+    ADD CONSTRAINT mh_1_config_acctattribute_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: mh_1_config_accttype_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
 ALTER TABLE ONLY mh_1_config_accttype
     ADD CONSTRAINT mh_1_config_accttype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_default_accttype_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_default_accttype
+    ADD CONSTRAINT mh_default_accttype_pkey PRIMARY KEY (id);
 
 
 --

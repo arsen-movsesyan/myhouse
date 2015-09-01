@@ -1,0 +1,39 @@
+
+{% extends "base/base.html" %}
+
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "config/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+
+<a href="/config/account/types/add">Add New Type</a>
+<br><br>
+
+<table border="1">
+    <tr align="center">
+	<td><b>Name</b></td>
+	<td><b>Brief Info</b></td>
+	<td><b>Description</b></td>
+    </tr>
+
+
+{% for acct_type in types %}
+    <tr>
+	<td><a href="edit/{{ acct_type.id }}">{{ acct_type.type_name }}</a></td>
+	<td>{{ acct_type.brief }}</td>
+	<td>{{ acct_type.description }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+{% endblock %}
