@@ -10,7 +10,7 @@ from datetime import date
 
 #from account.forms import AddEditUserForm,AddressForm
 
-from account.forms import AddEditAccountForm
+from account.forms import AddEditAccountForm,TimeWatchForm,AccountUserPermissionForm
 from account.models import Account
 from config.models import AccountType
 
@@ -18,10 +18,12 @@ from config.models import AccountType
 
 @login_required
 def view_accounts(request,view_filter='active'):
+    house_user = request.user.house_user
     template = loader.get_template("account/view_accounts.html")
     context = dict()
     if view_filter == 'all':
-	accounts = Account.objects.all()
+	accounts = Account.objects.filter(created_by=house_user.user_id)
+#	accounts = Account.objects.all()
 	context['view_method'] = 'all'
     elif view_filter == 'active':
 	accounts = Account.objects.filter(disabled = False)
@@ -41,6 +43,7 @@ def view_account(request,in_acct_id):
 
 @login_required
 def add_account(request):
+    main_user = request.user.house_user
     if request.method == 'POST':
 	in_form = AddEditAccountForm(request.POST)
 	if in_form.is_valid():
@@ -62,7 +65,10 @@ def add_account(request):
 	    return HttpResponse(template.render({'form':in_form}))
     template = "account/add_edit_account.html"
     in_form = AddEditAccountForm()
-    context = {'form':in_form}
+    tw_form = TimeWatchForm()
+    access_form = AccountUserPermissionForm(initial={'can_view':True,'can_manage':True,'can_edit':False})
+    other = main_user.get_other_users()
+    context = {'form':in_form,'tw_form':tw_form,'other':other,'access_form':access_form}
     return render(request,template,context)
 
 

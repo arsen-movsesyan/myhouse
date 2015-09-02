@@ -8,7 +8,7 @@ import re
 
 
 class CreateUserForm(ModelForm):
-#    password = forms.CharField(label='Password',widget=forms.PasswordInput)
+    password = forms.CharField(label='Password',widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirm Password',widget=forms.PasswordInput)
     confirm_email = forms.CharField(label='Confirm email')
     complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
@@ -31,7 +31,13 @@ class CreateUserForm(ModelForm):
 	    if email != confirm_email:
 		self.add_error('confirm_email', "Email Confirmation mismatch")
 
-
+	if 'password' in cleaned_data and 'confirm_password' in cleaned_data:
+	    password = cleaned_data['password']
+	    confirm_password = cleaned_data['confirm_password']
+	    if password != confirm_password:
+		self.add_error('confirm_password',"Password confirmation mismatch")
+	else:
+	    self.add_error('password', "Password may not be emty")
 
 class LoginUserForm(ModelForm):
 #    email = forms.CharField(label='Email')

@@ -8,6 +8,8 @@ import re
 
 class AddEditUserForm(ModelForm):
     complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
+    hh_superuser = forms.BooleanField(required=False)
+    can_login = forms.BooleanField(required=False)
 
     class Meta:
 	model = HouseUser

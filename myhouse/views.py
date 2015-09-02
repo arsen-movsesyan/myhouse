@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 
-#from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 
@@ -13,6 +13,7 @@ from datetime import date
 from .forms import CreateUserForm,LoginUserForm
 
 from account.models import HouseUser
+from people.models import Household,MapUserHousehold
 
 
 def _index(request):
@@ -39,7 +40,6 @@ def self_register(request):
 		created_by = auth_user.id,
 		dob = in_form.cleaned_data['dob'],
 		sex = in_form.cleaned_data['sex'],
-		mh_superuser = True,
 		ssn_13 = ssn[0:3],
 		ssn_45 = ssn[4:6],
 		ssn_69 = ssn[7:11],
@@ -49,7 +49,15 @@ def self_register(request):
 		title = in_form.cleaned_data['title'],
 		suffix = in_form.cleaned_data['suffix'],
 	    )
-	    household_user.save()
+#	    household_user.save()
+	    new_household = Household.objects.create()
+	    map_user_household = MapUserHousehold.objects.create(
+		user = household_user,
+		household = new_household,
+		hh_superuser = True,
+	    )
+
+
 	    user = authenticate(username=username, password=password)    
 	    login(request,user)
 	    return HttpResponseRedirect('account/')
@@ -69,8 +77,9 @@ def log_in(request):
 	user = authenticate(
 		username = request.POST['email'], 
 		password = request.POST['password'])
-	if user is not None:
+	if user is not None and user.is_active:
 	    login(request,user)
+	    request.session['user_name'] = user.house_user
 	    return HttpResponseRedirect('/account/')
 	else:
 	    return HttpResponse('Wrong Credentials')

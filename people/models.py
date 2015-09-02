@@ -24,7 +24,7 @@ class HouseUser(models.Model):
     ssn_13 = models.CharField(max_length=3,blank=False)
     ssn_45 = models.CharField(max_length=2,blank=False)
     ssn_69 = models.CharField(max_length=4,blank=False)
-    mh_superuser = models.BooleanField(default=False) #In addition to "is_superuser" this is for household admin
+#    mh_superuser = models.BooleanField(default=False) #In addition to "is_superuser" this is for household admin
     sex =  models.CharField(max_length=255,choices=HUMAN_SEX,blank=False)
     first_name = models.CharField(max_length=255,blank=False)
     last_name = models.CharField(max_length=255,blank=False)
@@ -37,7 +37,7 @@ class HouseUser(models.Model):
 
     class Meta:
 	managed = False
-	db_table = "mh_{0}_account_house_user".format(settings.PROJECT_VERSION)
+	db_table = "mh_{0}_people_house_user".format(settings.PROJECT_VERSION)
 
 
     def get_complete_ssn(self,clear=False):
@@ -50,14 +50,34 @@ class HouseUser(models.Model):
     def __str__(self):
 	return "{0} {1}".format(self.first_name,self.last_name)
 
-"""
-class MapUserHousehold(models.Model):
-    user = models.OneToOneField('HouseUser',db_column='user_id',primary_key=True
-	,related_name='to_household')
-    household = models.ForeignKey('Household',related_name='belong_users')
+    def is_hh_superuser(self):
+	map_obj = self.user_map
+	return map_obj.hh_superuser
+
+
+    def get_other_users(self):
+	my_household = self.user_map.household
+	other_users = MapUserHousehold.objects.filter(household_id=my_household.id).exclude(pk=self)
+	return other_users
+
+class Household(models.Model):
+    id = models.AutoField(primary_key=True)
+    create_date = models.DateField(auto_now_add=True)
 
     class Meta:
 	managed = False
-	db_table = "mh_{0}_account_map_user_household".format(settings.PROJECT_VERSION)
+	db_table = "mh_{0}_myhouse_household".format(settings.PROJECT_VERSION)
 
-"""
+
+
+class MapUserHousehold(models.Model):
+    user = models.OneToOneField(HouseUser,
+	db_column = 'user_id',
+	primary_key = True,
+	related_name = 'user_map')
+    household = models.ForeignKey(Household,db_column='household_id')
+    hh_superuser = models.BooleanField(default=False)
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_map_user_household".format(settings.PROJECT_VERSION)

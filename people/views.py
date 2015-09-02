@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
+from django.contrib.auth.models import User
 
 from django.contrib.auth.decorators import login_required
 
 from datetime import date
-
+#from myhouse.models import MapUserHousehold
 from people.forms import AddEditUserForm
-from people.models import HouseUser
+from people.models import HouseUser,MapUserHousehold
 
 
 @login_required
@@ -36,7 +37,9 @@ def edit_profile(request):
 	context = dict()
 	my_ssn = main_user.get_complete_ssn(clear=False)
 	in_form = AddEditUserForm(instance=main_user,
-	    initial={'login_enabled':True,'complete_ssn':my_ssn})
+	    initial={'login_enabled':True,'complete_ssn':my_ssn,
+	    'can_login':True,
+	    'hh_superuser':main_user.user_map.hh_superuser,})
 	context['user'] = main_user
 	context['form'] = in_form
 	return render(request,template,context)
@@ -44,16 +47,19 @@ def edit_profile(request):
 
 @login_required
 def view_persons(request):
-    main_user=request.user.house_user
-    all_persons = HouseUser.objects.filter(disabled=False)
+    house_user=request.user.house_user
+    my_household = house_user.user_map.household
+    user_maps = MapUserHousehold.objects.filter(household=my_household)
     template = loader.get_template('people/view_users.html')
     context=dict()
-    context['persons'] = all_persons
+    context['persons'] = user_maps
+    context['house_user'] = house_user
     return HttpResponse(template.render(context))
 
 
 @login_required
 def add_person(request):
+    house_user = request.user.house_user
     if request.method == 'POST':
 	in_form = AddEditUserForm(request.POST)
 	if in_form.is_valid():
@@ -67,12 +73,15 @@ def add_person(request):
 		password
 	    )
 #	    auth_user.is_active = in_form.cleaned_data['login_enabled']
-	    auth_user.is_active = False
+	    if 'can_login' in in_form.cleaned_data:
+		auth_user.is_active = True
+	    else:
+		auth_user.is_active = False
 	    auth_user.save()
 	    ssn=in_form.cleaned_data['complete_ssn']
-	    household_user = HouseUser.objects.create(
+	    new_user = HouseUser.objects.create(
 		auth_user = auth_user,
-		created_by = request.user.id,
+		created_by = house_user.auth_user.id,
 		dob = in_form.cleaned_data['dob'],
 		sex = in_form.cleaned_data['sex'],
 #		mh_superuser = in_form.cleaned_data['mh_superuser'],
@@ -85,7 +94,14 @@ def add_person(request):
 		title = in_form.cleaned_data['title'],
 		suffix = in_form.cleaned_data['suffix'],
 	    )
-	    household_user.save()
+	    household = house_user.user_map.household
+	    map_obj = MapUserHousehold.objects.create(
+		household = household,
+		user = new_user
+	    )
+	    if 'hh_superuser' in in_form.cleaned_data:
+		map_obj.hh_superuser = in_form.cleaned_data['hh_superuser']
+	    map_obj.save()
 	    return HttpResponseRedirect("/people/")
 	else:
 	    template = loader.get_template('base/err_template.html')
@@ -102,6 +118,7 @@ def add_person(request):
 def edit_person(request,in_user_id):
     auth_user = User.objects.get(pk=in_user_id)
     household_user = auth_user.house_user
+    map_obj = MapUserHousehold.objects.get(pk=household_user)
     if request.method == 'POST':
 	in_form = AddEditUserForm(request.POST)
 	if in_form.is_valid():
@@ -110,23 +127,30 @@ def edit_person(request,in_user_id):
 
 	    auth_user.email = in_form.cleaned_data['email']
 	    auth_user.username = in_form.cleaned_data['email']
+	    if 'can_login' in in_form.cleaned_data:
+		auth_user.is_active = True
+	    else:
+		auth_user.is_active = False
 #	    auth_user.is_active = in_form.cleaned_data['login_enabled']
 	    auth_user.save()
 
 	    ssn=in_form.cleaned_data['complete_ssn']
-	    household_user.dob = in_form.cleaned_data['dob'],
-	    household_user.sex = in_form.cleaned_data['sex'],
+	    household_user.dob = in_form.cleaned_data['dob']
+	    household_user.sex = in_form.cleaned_data['sex']
 #	    household_user.mh_superuser = in_form.cleaned_data['mh_superuser'],
-	    household_user.ssn_13 = ssn[0:3],
-	    household_user.ssn_45 = ssn[4:6],
-	    household_user.ssn_69 = ssn[7:11],
-	    household_user.first_name = in_form.cleaned_data['first_name'],
-	    household_user.last_name = in_form.cleaned_data['last_name'],
-	    household_user.email = email,
-	    household_user.title = in_form.cleaned_data['title'],
-	    household_user.suffix = in_form.cleaned_data['suffix'],
+	    household_user.ssn_13 = ssn[0:3]
+	    household_user.ssn_45 = ssn[4:6]
+	    household_user.ssn_69 = ssn[7:11]
+	    household_user.first_name = in_form.cleaned_data['first_name']
+	    household_user.last_name = in_form.cleaned_data['last_name']
+	    household_user.email = in_form.cleaned_data['email']
+	    household_user.title = in_form.cleaned_data['title']
+	    household_user.suffix = in_form.cleaned_data['suffix']
 	    
 	    household_user.save()
+	    if 'hh_superuser' in in_form.cleaned_data:
+		map_obj.hh_superuser = in_form.cleaned_data['hh_superuser']
+		map_obj.save()
 	    return HttpResponseRedirect("/people/")
 	else:
 	    template = loader.get_template('base/err_template.html')
@@ -135,8 +159,9 @@ def edit_person(request,in_user_id):
     else:
 	template = "people/add_edit_user.html"
 	in_form = AddEditUserForm(instance=household_user,
-	    initial={'login_enabled':auth_user.is_active,
-		    'complete_ssn':household_user.get_complete_ssn(clear=False)})
+	    initial={'can_login':auth_user.is_active,
+		    'complete_ssn':household_user.get_complete_ssn(clear=False),
+		    'hh_superuser':map_obj.hh_superuser})
 	return render(request,template,{'form':in_form})
 
 
@@ -151,5 +176,3 @@ def delete_person(request,in_user_id):
 	user_to_delete.house_user.delete()
 	user_to_delete.delete()
     return HttpResponseRedirect("/people/")
-
-
