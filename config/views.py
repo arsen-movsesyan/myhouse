@@ -13,7 +13,9 @@ from config.models import AccountType,AccountAttribute
 @login_required
 def view_all_objects(request):
     template = loader.get_template("config/all_objects.html")
-    return HttpResponse(template.render())
+    context = dict()
+    context['username'] = request.session['user_name']
+    return HttpResponse(template.render(context))
 
 
 @login_required
@@ -22,6 +24,7 @@ def manage_acct_type(request):
     context = dict()
     template = "config/manage_acct_types.html"
     context['types'] = acct_types
+    context['username'] = request.session['user_name']
     return render(request,template,context)
 
 
@@ -44,6 +47,7 @@ def add_acct_type(request):
     in_form = AddEditAccountTypeForm()
     template = "config/add_edit_acct_type.html"
     context = {'form':in_form}
+    context['username'] = request.session['user_name']
     return render(request,template,context)
 
 @login_required
@@ -65,6 +69,7 @@ def edit_acct_type(request,in_type_id):
     in_form = AddEditAccountTypeForm(instance=acct_type)
     template = "config/add_edit_acct_type.html"
     context = {'form':in_form}
+    context['username'] = request.session['user_name']
     return render(request,template,context)
 
 
@@ -93,6 +98,7 @@ def add_acct_attribute(request):
     in_form = AddAccountAttributeForm()
     template = "config/add_acct_attribute.html"
     context = {'form':in_form}
+    context['username'] = request.session['user_name']
     return render(request,template,context)
 
     

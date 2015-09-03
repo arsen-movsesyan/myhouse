@@ -487,12 +487,12 @@ ALTER TABLE mh_1_account_time_watch OWNER TO postgres;
 --
 
 CREATE TABLE mh_1_account_user_permission (
-    id integer NOT NULL,
     account_id integer NOT NULL,
     user_id integer NOT NULL,
     can_view boolean NOT NULL,
     can_manage boolean NOT NULL,
-    can_edit boolean NOT NULL
+    can_edit boolean NOT NULL,
+    id integer NOT NULL
 );
 
 
@@ -904,6 +904,21 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 52	Can add account user permission	18	add_accountuserpermission
 53	Can change account user permission	18	change_accountuserpermission
 54	Can delete account user permission	18	delete_accountuserpermission
+55	Can add account attribute value	19	add_accountattributevalue
+56	Can change account attribute value	19	change_accountattributevalue
+57	Can delete account attribute value	19	delete_accountattributevalue
+58	Can add account time watch	20	add_accounttimewatch
+59	Can change account time watch	20	change_accounttimewatch
+60	Can delete account time watch	20	delete_accounttimewatch
+61	Can add account payment history	21	add_accountpaymenthistory
+62	Can change account payment history	21	change_accountpaymenthistory
+63	Can delete account payment history	21	delete_accountpaymenthistory
+64	Can add household	22	add_household
+65	Can change household	22	change_household
+66	Can delete household	22	delete_household
+67	Can add map user household	23	add_mapuserhousehold
+68	Can change map user household	23	change_mapuserhousehold
+69	Can delete map user household	23	delete_mapuserhousehold
 \.
 
 
@@ -911,7 +926,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 54, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 69, true);
 
 
 --
@@ -919,9 +934,8 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 54, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-33	pbkdf2_sha256$20000$jcaREeIuVt4y$e64SzbTPcyVhh6hn3PQB6+e5vmGz7llpGukrp4ThMOs=	2015-09-01 14:45:53.797342-07	f	poghos@test.com			poghos@test.com	f	t	2015-09-01 14:34:07.814296-07
-24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-01 14:48:34.552331-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
-34	pbkdf2_sha256$20000$exMoF69l0OfX$xK4GVKeGsC9mZVM1nydXOOBN/CPqs8xJ2LB7SAfSRsU=	\N	f	petros@test.com			petros@test.com	f	t	2015-09-01 17:05:08.376218-07
+33	pbkdf2_sha256$20000$jcaREeIuVt4y$e64SzbTPcyVhh6hn3PQB6+e5vmGz7llpGukrp4ThMOs=	2015-09-02 10:12:42.436486-07	f	poghos@test.com			poghos@test.com	f	t	2015-09-01 14:34:07.814296-07
+24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-02 10:13:07.598081-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
 21	pbkdf2_sha256$20000$S2Z4V1zJsMqg$u3oWDghu1FXRZAyp94iH+TiTntxOrMmpiVlk65v0kkw=	2015-09-01 12:48:07.161311-07	t	arsen			arsen.movsesyan@gmail.com	t	t	2015-09-01 11:59:37.014824-07
 \.
 
@@ -945,7 +959,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 34, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 35, true);
 
 
 --
@@ -998,6 +1012,11 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 16	people	houseuser
 17	config	accountattribute
 18	account	accountuserpermission
+19	account	accountattributevalue
+20	account	accounttimewatch
+21	account	accountpaymenthistory
+22	people	household
+23	people	mapuserhousehold
 \.
 
 
@@ -1005,7 +1024,7 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 18, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 23, true);
 
 
 --
@@ -1034,6 +1053,8 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 19	people	0001_initial	2015-09-01 11:57:53.073054-07
 20	people	0002_auto_20150901_1242	2015-09-01 12:42:49.710651-07
 21	account	0007_accountuserpermission	2015-09-01 15:08:05.557119-07
+22	account	0008_accountattributevalue_accountpaymenthistory_accounttimewatch	2015-09-02 18:27:25.866498-07
+23	people	0003_household_mapuserhousehold	2015-09-02 18:27:25.902716-07
 \.
 
 
@@ -1041,7 +1062,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 21, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 23, true);
 
 
 --
@@ -1049,8 +1070,8 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 21, true);
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-uroqbxl6t2srwtdoi3tbs1l2g07tiqjf	N2EyZTA5NDg3YjkwN2IzMDEzMjVlMDM0MmVkYmY5MDY1YmRiZGU0Njp7Il9hdXRoX3VzZXJfaGFzaCI6ImJlYTJmMWMyMzMyYzYxMzgxZDU3YzlkNTU1OWQ3M2JiZjA0ZDIwYmMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIyNCJ9	2015-09-15 14:48:34.554479-07
 iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
+la10fj11mq1wsvvccm6cyy96oc33l0mr	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE2NzJlODp7InVzZXJfaWQiOjI0LCJfYXV0aF91c2VyX2lkIjoiMjQiLCJob3VzZWhvbGRfaWQiOjYsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiYmVhMmYxYzIzMzJjNjEzODFkNTdjOWQ1NTU5ZDczYmJmMDRkMjBiYyIsInVzZXJfbmFtZSI6IkFyc2VuIn0=	2015-09-16 10:13:07.606873-07
 \.
 
 
@@ -1059,7 +1080,7 @@ iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjV
 --
 
 COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id, disabled, disabled_date, time_watch, access_login, access_password) FROM stdin;
-7	Yahoo	2015-09-01	24	http://www.yahoo.com	2	f	\N	f	kukublin	
+11	Google	2015-09-02	24	http://www.google.com	3	f	\N	f	aaa	sss
 \.
 
 
@@ -1067,7 +1088,7 @@ COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, ac
 -- Name: mh_1_account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_account_id_seq', 7, true);
+SELECT pg_catalog.setval('mh_1_account_account_id_seq', 11, true);
 
 
 --
@@ -1105,7 +1126,8 @@ COPY mh_1_account_time_watch (account_id, auto_payment, month_frequency, month_d
 -- Data for Name: mh_1_account_user_permission; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_user_permission (id, account_id, user_id, can_view, can_manage, can_edit) FROM stdin;
+COPY mh_1_account_user_permission (account_id, user_id, can_view, can_manage, can_edit, id) FROM stdin;
+11	33	t	f	t	3
 \.
 
 
@@ -1113,7 +1135,7 @@ COPY mh_1_account_user_permission (id, account_id, user_id, can_view, can_manage
 -- Name: mh_1_account_user_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 4, true);
 
 
 --
@@ -1191,7 +1213,6 @@ COPY mh_1_map_household_address (ba_id, hh_id, comment) FROM stdin;
 COPY mh_1_map_user_household (user_id, household_id, hh_superuser) FROM stdin;
 24	6	t
 33	6	f
-34	6	f
 \.
 
 
@@ -1211,7 +1232,6 @@ COPY mh_1_myhouse_household (id, create_date) FROM stdin;
 COPY mh_1_people_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, sex, first_name, last_name, email, title, suffix, created_by, disabled, disabled_at) FROM stdin;
 24	1970-02-21	123	45	6789	MALE	Arsen	Movsesyan	arsen@test.com	MR		24	f	\N
 33	1990-01-01	123	45	6789	MALE	Poghos	Petrosyan	poghos@test.com	MR		24	f	\N
-34	1990-02-02	123	45	6789	MALE	Petros	Poghosyan	petros@test.com	MR		24	f	\N
 \.
 
 

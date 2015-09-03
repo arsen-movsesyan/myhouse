@@ -18,6 +18,32 @@
 
 {{ form.as_table }}
 
+
+    <tr>
+	<td colspan="2">
+{{ access_formset.management_form }}
+<table border="1">
+    <tr>
+	<td>Account</td>
+	<td>View</td>
+	<td>Manage</td>
+	<td>Edit</td>
+    </tr>
+{% for access in access_formset %}
+    <tr>
+	<td>{{ access.account_name }}
+{{ access.id }}
+{{ access.account_id }}</td>
+	<td>{{ access.can_view }}</td>
+	<td>{{ access.can_manage }}</td>
+	<td>{{ access.can_edit }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+	</td>
+    </tr>
+
 <tr>
     <td colspan=2 align="center">
 <input type="submit" value="Submit">

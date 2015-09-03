@@ -10,6 +10,8 @@ from datetime import date
 from people.forms import AddEditUserForm
 from people.models import HouseUser,MapUserHousehold
 
+from account.models import Account,AccountUserPermission
+from account.forms import AccessFormSet
 
 @login_required
 def edit_profile(request):
@@ -42,6 +44,7 @@ def edit_profile(request):
 	    'hh_superuser':main_user.user_map.hh_superuser,})
 	context['user'] = main_user
 	context['form'] = in_form
+	context['username'] = request.session['user_name']
 	return render(request,template,context)
 
 
@@ -54,12 +57,14 @@ def view_persons(request):
     context=dict()
     context['persons'] = user_maps
     context['house_user'] = house_user
+    context['username'] = request.session['user_name']
     return HttpResponse(template.render(context))
 
 
 @login_required
 def add_person(request):
     house_user = request.user.house_user
+    accounts = Account.objects.filter(created_by=house_user)
     if request.method == 'POST':
 	in_form = AddEditUserForm(request.POST)
 	if in_form.is_valid():
@@ -110,7 +115,21 @@ def add_person(request):
     else:
 	template = "people/add_edit_user.html"
 	in_form = AddEditUserForm(initial={'login_enabled':True})
-	return render(request,template,{'form':in_form})
+
+	init_formset_data = []
+	for account in accounts:
+	    init_form_data={
+		'account_id':account.pk,
+		'account_name':account.acct_name,
+		'can_view':True,
+		'can_manage':True,
+		'can_edit':False}
+	    init_formset_data.append(init_form_data)
+
+	access_formset = AccessFormSet(initial=init_formset_data)
+	context = {'form':in_form,'access_formset':access_formset}
+	context['username'] = request.session['user_name']
+	return render(request,template,context)
 
 
 
@@ -162,7 +181,9 @@ def edit_person(request,in_user_id):
 	    initial={'can_login':auth_user.is_active,
 		    'complete_ssn':household_user.get_complete_ssn(clear=False),
 		    'hh_superuser':map_obj.hh_superuser})
-	return render(request,template,{'form':in_form})
+	context = {'form':in_form}
+	context['username'] = request.session['user_name']
+	return render(request,template,context)
 
 
 @login_required
@@ -170,9 +191,9 @@ def delete_person(request,in_user_id):
     auth_user = request.user
     user_to_delete = User.objects.get(pk=in_user_id)
     if auth_user != user_to_delete:
-	user_to_delete.house_user.disabled = True
-	user_to_delete.house_user.disabled_at = date.today()
-	user_to_delete.house_user.save()
-	user_to_delete.house_user.delete()
+#	user_to_delete.house_user.disabled = True
+#	user_to_delete.house_user.disabled_at = date.today()
+#	user_to_delete.house_user.save()
+#	user_to_delete.house_user.delete()
 	user_to_delete.delete()
     return HttpResponseRedirect("/people/")

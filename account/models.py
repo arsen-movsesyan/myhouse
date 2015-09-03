@@ -28,7 +28,12 @@ class Account(models.Model):
 class AccountUserPermission(models.Model):
     id = models.AutoField(primary_key=True)
     account = models.ForeignKey(Account)
-    user = models.ForeignKey(HouseUser)
+    user = models.ForeignKey(HouseUser,related_name='access_user')
+#    account = models.OneToOneField(Account,
+#	db_column='account_id')
+#    user = models.OneToOneField(HouseUser,
+#	related_name='access_user',
+#	db_column='user_id')
     can_view = models.BooleanField()
     can_manage = models.BooleanField()
     can_edit = models.BooleanField()

@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^view_time_watch$',views.view_time_watch),
 
     url(r'add$',views.add_account),
-    url(r'view/(?P<in_acct_id>\d)$',views.view_account),
-    url(r'edit/(?P<in_acct_id>\d)$',views.edit_account),
+    url(r'view/(?P<in_acct_id>\d+)$',views.view_account),
+    url(r'edit/(?P<in_acct_id>\d+)$',views.edit_account),
+    url(r'delete/(?P<in_acct_id>\d+)$',views.delete_account),
 )

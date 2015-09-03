@@ -47,7 +47,7 @@ class HouseUser(models.Model):
 	    return self.complete_ssn.replace('-','')
 	return self.complete_ssn
 
-    def __str__(self):
+    def __unicode__(self):
 	return "{0} {1}".format(self.first_name,self.last_name)
 
     def is_hh_superuser(self):

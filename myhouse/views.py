@@ -79,7 +79,10 @@ def log_in(request):
 		password = request.POST['password'])
 	if user is not None and user.is_active:
 	    login(request,user)
-	    request.session['user_name'] = user.house_user
+	    request.session['user_id'] = user.id
+	    household_id = user.house_user.user_map.household.id
+	    request.session['household_id'] = household_id
+	    request.session['user_name'] = user.house_user.first_name
 	    return HttpResponseRedirect('/account/')
 	else:
 	    return HttpResponse('Wrong Credentials')

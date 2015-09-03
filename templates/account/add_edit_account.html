@@ -41,6 +41,7 @@ function hideshow(which){
 
     <tr>
 	<td colspan="2">
+{{ access_formset.management_form }}
 <table border="1">
     <tr>
 	<td>Person</td>
@@ -48,12 +49,14 @@ function hideshow(which){
 	<td>Manage</td>
 	<td>Edit</td>
     </tr>
-{% for person in other %}
+{% for access in access_formset %}
     <tr>
-	<td>{{ person.user }}</td>
-	<td>{{ access_form.can_view }}</td>
-	<td>{{ access_form.can_manage }}</td>
-	<td>{{ access_form.can_edit }}</td>
+	<td>{{ access.user_name }}
+{{ access.id }}
+{{ access.user_id }}</td>
+	<td>{{ access.can_view }}</td>
+	<td>{{ access.can_manage }}</td>
+	<td>{{ access.can_edit }}</td>
     </tr>
 {% endfor %}
 
