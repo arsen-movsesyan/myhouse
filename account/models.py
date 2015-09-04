@@ -18,6 +18,8 @@ class Account(models.Model):
     time_watch = models.BooleanField(default=False)
     access_login = models.CharField(max_length=255,blank=True)
     access_password = models.CharField(max_length=255,blank=True)
+    brief = models.CharField(max_length=255,blank=True)
+    description = models.TextField(blank=True)
 
     class Meta:
 	managed = False
@@ -25,15 +27,20 @@ class Account(models.Model):
 
 
 
+#def get_our_accounts(in_hh_id):
+#    ret_set = Account.objects.raw("""
+#	SELECT * FROM mh_1_account_account
+#	WHERE created_by IN (
+#	SELECT hu.user_id FROM mh_1_people_house_user hu
+#	JOIN mh_1_map_user_household muh ON hu.user_id=muh.user_id
+#	WHERE muh.household_id='{0}')""".format(in_hh_id))
+#    return ret_set
+
+
 class AccountUserPermission(models.Model):
     id = models.AutoField(primary_key=True)
-    account = models.ForeignKey(Account)
-    user = models.ForeignKey(HouseUser,related_name='access_user')
-#    account = models.OneToOneField(Account,
-#	db_column='account_id')
-#    user = models.OneToOneField(HouseUser,
-#	related_name='access_user',
-#	db_column='user_id')
+    account = models.ForeignKey(Account,db_column='account_id')
+    user = models.ForeignKey(HouseUser,related_name='access_user',db_column='user_id')
     can_view = models.BooleanField()
     can_manage = models.BooleanField()
     can_edit = models.BooleanField()
@@ -64,9 +71,9 @@ class AccountTimeWatch(models.Model):
 	db_column='account_id',
 	related_name='t_watch')
     auto_payment = models.BooleanField()
-    month_frequency = models.IntegerField(blank=True)
-    month_due_date = models.DateField(blank=True)
-    initial_payment_date = models.DateField(blank=True)
+    month_frequency = models.IntegerField(blank=True,default=1)
+    due_month_day = models.IntegerField(blank=True)
+    initial_payment_date = models.DateField(blank=True,null=True)
 
     class Meta:
 	managed = False

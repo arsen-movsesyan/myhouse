@@ -29,7 +29,7 @@
 
 {% for acct_type in types %}
     <tr>
-	<td><a href="edit/{{ acct_type.id }}">{{ acct_type.type_name }}</a></td>
+	<td><a class="noticable" href="edit/{{ acct_type.id }}">{{ acct_type.type_name }}</a></td>
 	<td>{{ acct_type.brief }}</td>
 	<td>{{ acct_type.description }}</td>
     </tr>

@@ -17,14 +17,15 @@ class AddEditAccountForm(ModelForm):
 
     class Meta:
 	model = Account
-	fields = ['acct_name','login_url','time_watch','acct_type','disabled','access_login','access_password']
+	fields = ['acct_name','login_url','brief','acct_type',
+	    'disabled','access_login','access_password','description']
 
 
 class TimeWatchForm(ModelForm):
 
     class Meta:
 	model = AccountTimeWatch
-	fields = ['month_frequency','month_due_date','initial_payment_date','auto_payment']
+	fields = ['auto_payment','month_frequency','due_month_day','initial_payment_date']
 
 class AccountUserPermissionForm(ModelForm):
     id = forms.CharField(widget=forms.HiddenInput,required=False)

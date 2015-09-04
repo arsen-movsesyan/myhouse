@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
-
 class HouseUser(models.Model):
     HUMAN_SEX = [('MALE',"Male"),('FEMALE',"Female")]
     HUMAN_TITLE = [
@@ -59,6 +58,7 @@ class HouseUser(models.Model):
 	my_household = self.user_map.household
 	other_users = MapUserHousehold.objects.filter(household_id=my_household.id).exclude(pk=self)
 	return other_users
+
 
 class Household(models.Model):
     id = models.AutoField(primary_key=True)

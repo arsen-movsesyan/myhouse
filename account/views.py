@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 
 from account.forms import AddEditAccountForm,TimeWatchForm,AccessFormSet
-from account.models import Account,AccountUserPermission
+from account.models import Account,AccountUserPermission,AccountTimeWatch
 from config.models import AccountType
 from people.models import HouseUser
 
@@ -23,8 +23,11 @@ def view_accounts(request,view_filter='active'):
 # Add all other with 'can_view' permission
 	context['view_method'] = 'all'
     elif view_filter == 'active':
-	accounts = Account.objects.filter(disabled = False)
+	accounts = Account.objects.filter(created_by=house_user).filter(disabled = False)
 	context['view_method'] = 'active'
+    elif view_filter == 'time_watch':
+	accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
+	context['view_method'] = 'time_watch'
     context['all_accounts'] = accounts
     context['username'] = request.session['user_name']
     return HttpResponse(template.render(context))
@@ -46,20 +49,22 @@ def add_account(request):
     other = main_user.get_other_users()
     if request.method == 'POST':
 	in_form = AddEditAccountForm(request.POST)
-#	tw_form = TimeWatchForm(request.POST)
 	access_formset = AccessFormSet(request.POST)
 	if access_formset.is_valid() and in_form.is_valid():
-	    acct_type = AccountType.objects.get(type_name=in_form.cleaned_data['acct_type'])
 	    new_acct = Account.objects.create(
 		acct_name = in_form.cleaned_data['acct_name'],
 		login_url = in_form.cleaned_data['login_url'],
 		created_by = request.user.house_user,
-		acct_type = acct_type,
+		acct_type = in_form.cleaned_data['acct_type'],
 	    )
-	    if not in_form.cleaned_data['access_login'] == None:
+	    if 'access_login' in in_form.cleaned_data:
 		new_acct.access_login = in_form.cleaned_data['access_login']
-	    if not in_form.cleaned_data['access_password'] == None:
+	    if 'access_password' in in_form.cleaned_data:
 		new_acct.access_password = in_form.cleaned_data['access_password']
+	    if 'brief' in in_form.cleaned_data:
+		new_acct.brief = in_form.cleaned_data['brief']
+	    if 'description' in in_form.cleaned_data:
+		new_acct.description = in_form.cleaned_data['description']
 	    new_acct.save()
 
 	    for access_form in access_formset:
@@ -76,9 +81,7 @@ def add_account(request):
 		    can_manage = can_manage,
 		    can_edit =can_edit
 		)
-#		print access_form.cleaned_data
 	    return HttpResponseRedirect("/account/")
-#	    return HttpResponseRedirect("#")
 	else:
 	    template = loader.get_template('base/err_template.html')
 	    return HttpResponse(template.render({'form':in_form}))
@@ -102,6 +105,7 @@ def add_account(request):
 	init_formset_data.append(init_form_data)
     access_formset = AccessFormSet(initial=init_formset_data)
     context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
+    context['action'] = 'add'
     context['username'] = request.session['user_name']
     return render(request,template,context)
 
@@ -118,18 +122,20 @@ def edit_account(request,in_acct_id):
 #	tw_form = TimeWatchForm(request.POST)
 	access_formset = AccessFormSet(request.POST)
 	if access_formset.is_valid() and in_form.is_valid():
-	    acct_type = AccountType.objects.get(type_name=in_form.cleaned_data['acct_type'])
 	    account_obj.acct_name = in_form.cleaned_data['acct_name']
 	    account_obj.login_url = in_form.cleaned_data['login_url']
-	    account_obj.acct_type = acct_type
+	    account_obj.acct_type = in_form.cleaned_data['acct_type']
 
-	    if in_form.cleaned_data['disabled']:
-		account_obj.disabled = True
-		account_obj.disabled_date = date.today()
-	    if not in_form.cleaned_data['access_login'] == None:
+	    if 'access_login' in in_form.cleaned_data:
 		account_obj.access_login = in_form.cleaned_data['access_login']
-	    if not in_form.cleaned_data['access_password'] == None:
+	    if 'access_password' in in_form.cleaned_data:
 		account_obj.access_password = in_form.cleaned_data['access_password']
+	    if 'brief' in in_form.cleaned_data:
+		account_obj.brief = in_form.cleaned_data['brief']
+	    if 'description' in in_form.cleaned_data:
+		account_obj.description = in_form.cleaned_data['description']
+	    if 'disabled' in in_form.cleaned_data:
+		account_obj.description = in_form.cleaned_data['disabled']
 	    account_obj.save()
 
 	    for access_form in access_formset:
@@ -169,6 +175,7 @@ def edit_account(request,in_acct_id):
 	init_formset_data.append(init_form_data)
     access_formset = AccessFormSet(initial=init_formset_data)
     context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
+    context['action'] = 'edit'
     context['username'] = request.session['user_name']
     return render(request,template,context)
 
@@ -182,6 +189,41 @@ def delete_account(request,in_acct_id):
 
 @login_required
 def view_time_watch(request):
-    return HttpResponseRedirect("/account/")
+    house_user = request.user.house_user
+    template = loader.get_template("account/view_time_watch.html")
+    context = dict()
+    accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
+    context['accounts'] = accounts
+    return HttpResponse(template.render(context))
 
 
+@login_required
+def make_time_watch(request,in_acct_id):
+    edit_account = Account.objects.get(pk=in_acct_id)
+    if request.method == 'POST':
+	in_form = TimeWatchForm(request.POST)
+	if in_form.is_valid():
+	    print in_form.cleaned_data
+	    edit_account.time_watch = True
+	    edit_account.save()
+	    new_time_watch = AccountTimeWatch.objects.create(
+		account = edit_account,
+		auto_payment = in_form.cleaned_data['auto_payment']
+	    )
+	    if 'month_frequency' in in_form.cleaned_data:
+		new_time_watch.month_frequency = in_form.cleaned_data['month_frequency']
+	    if 'due_month_day' in in_form.cleaned_data:
+		new_time_watch.due_month_day = in_form.cleaned_data['due_month_day']
+	    if 'initial_payment_date' in in_form.cleaned_data:
+		new_time_watch.initial_payment_date = in_form.cleaned_data['initial_payment_date']
+	    new_time_watch.save()
+	    return HttpResponseRedirect("/account/")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    template = "account/make_timewatch.html"    
+    in_form = TimeWatchForm(instance=edit_account)
+    context = {'form':in_form}
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
+    
