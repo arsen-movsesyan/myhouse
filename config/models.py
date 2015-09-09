@@ -27,3 +27,23 @@ class AccountAttribute(models.Model):
 
     def __str__(self):
 	return self.attribute_name
+
+class VehicleType(models.Model):
+    id = models.AutoField(primary_key=True)
+    vehicle_type = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_config_vehicle_type".format(settings.PROJECT_VERSION)
+
+class DocumentType(models.Model):
+    id = models.AutoField(primary_key=True)
+    document_type = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_config_document_type".format(settings.PROJECT_VERSION)
+
+

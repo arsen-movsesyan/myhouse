@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "vehicle/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "vehicle/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+Vehicle management<br><br>
+
+<table border="1">
+    <tr>
+	<td><b>Type</b></td>
+	<td><b>Name</b></td>
+	<td><b>Produced</b></td>
+	<td><b>Purchased</b></td>
+	<td><b>Owner</b></td>
+	<td><b>Actions</b></td>
+    </tr>
+{% for car in all_cars %}
+    <tr>
+	<td>{{ car.vehicle.vehicle_type.vehicle_type }}</td>
+	<td><a class="noticable" href="view/{{ car.vehicle.id }}">{{ car.make }} {{ car.model }}</a></td>
+	<td>{{ car.year_produced }}</td>
+	<td>{{ car.vehicle.date_purchased }}</td>
+	<td>{{ car.owned_by }}</td>
+	<td><a href="edit/{{ car.vehicle.id }}">Edit</a></td>
+    </tr>
+
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

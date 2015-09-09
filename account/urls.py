@@ -13,4 +13,6 @@ urlpatterns = patterns('',
     url(r'edit/(?P<in_acct_id>\d+)$',views.edit_account),
     url(r'delete/(?P<in_acct_id>\d+)$',views.delete_account),
     url(r'time_watch/(?P<in_acct_id>\d+)$',views.make_time_watch),
+    url(r'acknowledge/(?P<in_acct_id>\d+)$',views.acknowledge),
+    url(r'history/(?P<in_acct_id>\d+)$',views.view_payment_history),
 )

@@ -1,0 +1,43 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "vehicle/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "vehicle/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+Vehicles Time Vatch<br><br>
+
+<table border="1">
+    <tr>
+	<td><b>Type</b></td>
+	<td><b>Name</b></td>
+	<td><b>License Plate</b></td>
+	<td><b>Due Date</b></td>
+	<td><b>Days Left</b></td>
+	<td><b>Acknowledge</b></td>
+	<td><b>View History</b></td>
+
+    </tr>
+{% for car in all_cars %}
+    <tr>
+	<td>{{ car.obj.vehicle.vehicle_type.vehicle_type }}</td>
+	<td><a class="noticable" 
+	    href="view/{{ car.obj.vehicle.id }}">{{ car.obj.make }} {{ car.obj.model }}</a></td>
+	<td>{{ car.obj.license_plate }}</td>
+	<td>{{ car.due_date }}</td>
+	<td>{{ car.days_left }}</td>
+	<td><a href="renewal_acknowledge/{{ car.obj.vehicle.id }}">Click</a></td>
+	<td><a href="view_renewal_history/{{ car.obj.vehicle.id }}">View</a></td>
+    </tr>
+
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

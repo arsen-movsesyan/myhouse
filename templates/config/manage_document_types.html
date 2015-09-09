@@ -1,0 +1,37 @@
+
+{% extends "base/base.html" %}
+
+
+{% block config %}
+    {% include "config/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "config/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+
+<a href="/config/document/types/add">Add New Type</a>
+<br><br>
+
+<table border="1">
+    <tr align="center">
+	<td><b>Name</b></td>
+	<td><b>Description</b></td>
+    </tr>
+
+
+{% for type in document_types %}
+    <tr>
+	<td>{{ type.document_type }}</td>
+	<td>{{ type.description }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+{% endblock %}

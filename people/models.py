@@ -81,3 +81,4 @@ class MapUserHousehold(models.Model):
     class Meta:
 	managed = False
 	db_table = "mh_{0}_map_user_household".format(settings.PROJECT_VERSION)
+

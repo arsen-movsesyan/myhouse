@@ -23,12 +23,29 @@ Time Watch<br><br>
 
 {% for acct in accounts %}
     <tr>
-	<td><a class="noticable" href="view/{{ acct.id }}">{{ acct.acct_name }}</a></td>
-	<td>{{ acct.login_url }}</td>
-	<td>{{ acct.t_watch.due_month_day }}</td>
-	<td>10</td>
-	<td><a href="acknowledge/{{ acct.id }}" target="_blank">Acknowledge</a></td>
-	<td><a href="history/{{ acct.id }}">List Payments</a>
+	<td><a class="noticable" href="view/{{ acct.obj.id }}">{{ acct.obj.acct_name }}</a></td>
+	<td>{{ acct.obj.login_url }}</td>
+{#	<td align="center">{{ acct.obj.t_watch.due_month_day }}</td> #}
+	<td align="center">{{ acct.due_date }}</td>
+	<td align="center" bgcolor=
+{% if acct.auto_payment %}
+	"#ffffff"
+{% else %}
+	"{{ acct.color }}"
+{% endif %}
+	>{{ acct.days_left }}</td>
+	<td class="wide">
+{% if acct.auto_payment %}
+	Auto Payment
+{% else %}
+    {% if acct.show_payment %}
+	<a href="acknowledge/{{ acct.obj.id }}">Acknowledge</a>
+    {% else %}
+	No Payment Needed
+    {% endif %}
+{% endif %}
+	</td>
+	<td><a href="history/{{ acct.obj.id }}">List Payments</a>
     </tr>
 
 {% endfor %}

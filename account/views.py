@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 
 from datetime import date
 
-from account.forms import AddEditAccountForm,TimeWatchForm,AccessFormSet
-from account.models import Account,AccountUserPermission,AccountTimeWatch
+from account.forms import AddEditAccountForm,TimeWatchForm,AccessFormSet,AccountPaymentForm
+from account.models import Account,AccountUserPermission,AccountTimeWatch,AccountPaymentHistory
 from config.models import AccountType
 from people.models import HouseUser
 
@@ -191,9 +191,22 @@ def delete_account(request,in_acct_id):
 def view_time_watch(request):
     house_user = request.user.house_user
     template = loader.get_template("account/view_time_watch.html")
-    context = dict()
+    ret_array = []
     accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
-    context['accounts'] = accounts
+    for acct_obj in accounts:
+	info = dict()
+	info['obj'] = acct_obj
+	d_d_d=acct_obj.t_watch.get_due_date()
+	info['due_date'] = d_d_d['due_date']
+	info['days_left'] = d_d_d['days_left']
+	info['show_payment'] = d_d_d['show_payment']
+	info['auto_payment'] = d_d_d['auto_payment']
+	info['color'] = d_d_d['color']
+	ret_array.append(info)
+
+
+    context = {'accounts':ret_array}
+    context['username'] = request.session['user_name']
     return HttpResponse(template.render(context))
 
 
@@ -226,4 +239,39 @@ def make_time_watch(request,in_acct_id):
     context = {'form':in_form}
     context['username'] = request.session['user_name']
     return render(request,template,context)
-    
+
+
+@login_required
+def acknowledge(request,in_acct_id):
+    account = AccountTimeWatch.objects.get(pk=in_acct_id)
+    if request.method == 'POST':
+	in_form = AccountPaymentForm(request.POST)
+	if in_form.is_valid():
+	    payment_history = AccountPaymentHistory.objects.create(
+		account = account,
+		payment_date = in_form.cleaned_data['payment_date'],
+		payment_amount = in_form.cleaned_data['payment_amount']
+	    )
+	    if in_form.cleaned_data['skip_this_time']:
+		payment_history.confirmation_code = 'Void Acknowledged'
+	    else:
+		payment_history.confirmation_code = in_form.cleaned_data['confirmation_code']
+	    payment_history.save() 
+	    return HttpResponseRedirect("/account/view_time_watch")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    template = "account/acknowledge.html"
+    in_form = AccountPaymentForm()
+    context = {'account':account,'form':in_form}
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
+
+
+@login_required
+def view_payment_history(request,in_acct_id):
+    account = AccountTimeWatch.objects.get(pk=in_acct_id)
+    payments = account.payment_history.all()
+    template = loader.get_template("account/view_payment_history.html")
+    context = {'account':account,'payments':payments}
+    return HttpResponse(template.render(context))

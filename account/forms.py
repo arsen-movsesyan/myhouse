@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from django.forms.formsets import formset_factory
 
-from account.models import Account,AccountTimeWatch,AccountUserPermission
+from account.models import Account,AccountTimeWatch,AccountUserPermission,AccountPaymentHistory
 from people.models import HouseUser
 
 class VoidWidget(Widget):
@@ -44,6 +44,12 @@ class AccountUserPermissionForm(ModelForm):
 #	house_user = HouseUser.objects.get(pk=cleaned_data['user'])
 #	cleaned_data['user'] = house_user
 
+class AccountPaymentForm(ModelForm):
+    skip_this_time = forms.BooleanField(required=False)
+
+    class Meta:
+	model = AccountPaymentHistory
+	fields = ['payment_date','payment_amount','confirmation_code']
 
 
 AccessFormSet = formset_factory(AccountUserPermissionForm,extra=0)

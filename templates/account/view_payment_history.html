@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "account/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+Payment history for {{ account.account.acct_name }}<br><br>
+
+<table border="1">
+    <tr>
+	<td class="small_header">Date</td>
+	<td class="small_header">Amount</td>
+	<td class="small_header">Confirmation</td>
+    </tr>
+
+{% for payment in payments %}
+    <tr>
+	<td>{{ payment.payment_date }}</td>
+	<td>{{ payment.payment_amount }}</td>
+	<td>{{ payment.confirmation_code }}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

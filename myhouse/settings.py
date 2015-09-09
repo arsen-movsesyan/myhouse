@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'account',
     'people',
     'config',
+    'vehicle',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -117,3 +118,6 @@ LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 
 DURATIONFIELD_ALLOW_MONTHS = True
+
+WARNING_DAYS_LEFT = 12
+CRITICAL_DAYS_LEFT = 7

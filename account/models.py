@@ -1,10 +1,14 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Max
+from django.utils import timezone
+
 
 from people.models import HouseUser
 from config.models import AccountType,AccountAttribute
 
+from datetime import date,timedelta
 
 class Account(models.Model):
     id = models.AutoField(primary_key=True)
@@ -79,17 +83,58 @@ class AccountTimeWatch(models.Model):
 	managed = False
 	db_table = "mh_{0}_account_time_watch".format(settings.PROJECT_VERSION)
 
+    def get_due_date(self):
+	ret = dict()
+	ret['auto_payment'] = self.auto_payment
+
+	due_date = date(date.today().year,date.today().month,self.due_month_day)
+
+	if due_date < date.today():
+	    due_date = date(date.today().year,date.today().month + self.month_frequency,self.due_month_day)
+	ret['due_date'] = due_date
+
+	days_left = (due_date - date.today()).days
+	ret['days_left'] = days_left
+
+	last_payment = self.payment_history.aggregate(Max('payment_date'))['payment_date__max']
+	color = 'red'
+
+	if days_left >= settings.WARNING_DAYS_LEFT:
+	    color = '#00ff00'
+	elif days_left > settings.CRITICAL_DAYS_LEFT:
+	    color='yellow'
+	ret['color'] = color
+	ret['show_payment'] = True
+
+
+	if not last_payment or date.today() - last_payment > timedelta(days = self.month_frequency * 30):
+	    return ret
+
+	if due_date - timedelta(days = self.month_frequency * 30) < last_payment:
+	    due_date += timedelta(days = self.month_frequency * 30)
+	    days_left = (due_date - date.today()).days
+	    ret['days_left'] = days_left
+	    ret['show_payment'] = False
+	    ret['due_date'] = due_date
+	    if days_left >= settings.WARNING_DAYS_LEFT:
+		color = '#00ff00'
+	    elif days_left > settings.CRITICAL_DAYS_LEFT:
+		color='yellow'
+	    ret['color'] = color
+	return ret
+
 
 class AccountPaymentHistory(models.Model):
     id = models.AutoField(primary_key=True)
     account = models.ForeignKey(AccountTimeWatch,
 	db_column='account_id',
 	related_name='payment_history')
-    payment_date = models.DateField()
+    payment_date = models.DateField(default=timezone.now)
+#    payment_date = models.DateField(default=date.today())
     payment_amount = models.CharField(max_length=30)
     confirmation_code = models.CharField(max_length=255,blank=True)
 
     class Meta:
 	managed = False
 	db_table = "mh_{0}_account_payment_history".format(settings.PROJECT_VERSION)
-
+	ordering = ['payment_date']

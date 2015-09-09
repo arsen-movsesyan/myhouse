@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^account/',include('account.urls')),
     url(r'^people/',include('people.urls')),
     url(r'^config/',include('config.urls')),
+    url(r'^vehicle/',include('vehicle.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ]

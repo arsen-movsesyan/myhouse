@@ -10,6 +10,14 @@ urlpatterns = patterns('',
 
     url(r'account/attributes/$',views.manage_acct_attribute),
     url(r'account/attributes/add',views.add_acct_attribute),
+    url(r'vehicle/types/$',views.manage_vehicle_type),
+    url(r'vehicle/types/add',views.add_vehicle_type),
+
+    url(r'document/types/$',views.manage_document_type),
+    url(r'document/types/add',views.add_document_type),
+
+
+
 #    url(r'account/attribute/edit/(?P<in_type_id>\d+)$',views.edit_acct_type),
 
 #    url(r'view_household',views.view_household),
