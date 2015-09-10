@@ -47,3 +47,29 @@ class DocumentType(models.Model):
 	db_table = "mh_{0}_config_document_type".format(settings.PROJECT_VERSION)
 
 
+class DocumentAttribute(models.Model):
+    ATTRIBUTE_FORMAT = [('DATE','Date'),('INTEGER','Integer'),('STRING','String')]
+
+    id = models.AutoField(primary_key=True)
+#    doc_type = models.ForeignKey(DocumentType,db_column='doc_type_id',related_name='doc_attributes')
+    attribute = models.CharField(max_length=255)
+    attribute_format = models.CharField(max_length=255,
+	blank=True,
+	choices=ATTRIBUTE_FORMAT,
+	default='STRING')
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_config_document_attribute".format(settings.PROJECT_VERSION)
+
+
+class MapDocumentAttribute(models.Model):
+    id = models.AutoField(primary_key=True)
+    doc_type = models.ForeignKey(DocumentType,db_column='doc_type_id',related_name='doc_attributes')
+    attribute = models.OneToOneField(DocumentAttribute,db_column='attr_id')
+    attached = models.BooleanField()
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_config_map_doc_attribute".format(settings.PROJECT_VERSION)
+    

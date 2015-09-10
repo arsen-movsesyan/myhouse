@@ -10,8 +10,12 @@ from datetime import date
 from people.forms import AddEditUserForm
 from people.models import HouseUser,MapUserHousehold
 
+from config.models import DocumentType,DocumentAttribute,MapDocumentAttribute
+
 from account.models import Account,AccountUserPermission
 from account.forms import AccessFormSet
+
+
 
 @login_required
 def edit_profile(request):
@@ -229,3 +233,36 @@ def delete_person(request,in_user_id):
     if auth_user != user_to_delete:
 	user_to_delete.delete()
     return HttpResponseRedirect("/people/")
+
+
+@login_required
+def view_person(request,in_user_id):
+    view_user = HouseUser.objects.get(pk=in_user_id)
+    template = loader.get_template("people/view_user.html")
+    context = dict()
+    context['username'] = request.session['user_name']
+    context['view_user'] = view_user
+    context['ssn'] = view_user.get_complete_ssn()
+    return HttpResponse(template.render(context))
+
+
+@login_required
+def manage_documents(request,in_user_id):
+    view_user = HouseUser.objects.get(pk=in_user_id)
+
+    template = loader.get_template("people/manage_documents.html")
+    context = dict()
+    context['view_user'] = view_user
+    avail_docs = DocumentType.objects.all()
+    context['avail_docs'] = avail_docs
+    context['username'] = request.session['user_name']
+    return HttpResponse(template.render(context))
+
+
+@login_required
+def assign_document(request,in_user_id,in_doc_id):
+    assign_user = HouseUser.objects.get(pk=in_user_id)
+    assign_doc = DocumentType.objects.get(pk=in_doc_id)
+    if request.method == 'POST':
+	return HttpResponseRedirect("/people/view/documents/"+in_user_id+"/")
+    template = "people/assign_document.html"

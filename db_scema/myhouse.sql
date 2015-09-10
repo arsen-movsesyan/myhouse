@@ -391,7 +391,9 @@ CREATE TABLE mh_1_account_account (
     disabled_date date,
     time_watch boolean DEFAULT false NOT NULL,
     access_login character varying,
-    access_password character varying
+    access_password character varying,
+    brief character varying,
+    description text
 );
 
 
@@ -473,10 +475,10 @@ ALTER SEQUENCE mh_1_account_payment_history_id_seq OWNED BY mh_1_account_payment
 
 CREATE TABLE mh_1_account_time_watch (
     account_id integer NOT NULL,
-    auto_payment boolean NOT NULL,
-    month_frequency integer,
-    month_due_date integer,
-    initial_payment_date date
+    auto_payment boolean DEFAULT false NOT NULL,
+    due_month_day integer,
+    initial_payment_date date,
+    month_frequency integer DEFAULT 1
 );
 
 
@@ -661,6 +663,143 @@ ALTER SEQUENCE mh_1_config_accttype_id_seq OWNED BY mh_1_config_accttype.id;
 
 
 --
+-- Name: mh_1_config_document_attribute; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_document_attribute (
+    id integer NOT NULL,
+    attribute character varying NOT NULL,
+    attribute_format character varying
+);
+
+
+ALTER TABLE mh_1_config_document_attribute OWNER TO postgres;
+
+--
+-- Name: mh_1_config_document_attribute_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_document_attribute_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_document_attribute_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_document_attribute_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_document_attribute_id_seq OWNED BY mh_1_config_document_attribute.id;
+
+
+--
+-- Name: mh_1_config_document_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_document_type (
+    id integer NOT NULL,
+    document_type character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE mh_1_config_document_type OWNER TO postgres;
+
+--
+-- Name: mh_1_config_document_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_document_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_document_type_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_document_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_document_type_id_seq OWNED BY mh_1_config_document_type.id;
+
+
+--
+-- Name: mh_1_config_map_doc_attribute; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_map_doc_attribute (
+    id integer NOT NULL,
+    doc_type_id integer NOT NULL,
+    attr_id integer NOT NULL,
+    attached boolean NOT NULL
+);
+
+
+ALTER TABLE mh_1_config_map_doc_attribute OWNER TO postgres;
+
+--
+-- Name: mh_1_config_map_doc_attribute_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_map_doc_attribute_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_map_doc_attribute_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_map_doc_attribute_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_map_doc_attribute_id_seq OWNED BY mh_1_config_map_doc_attribute.id;
+
+
+--
+-- Name: mh_1_config_vehicle_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_config_vehicle_type (
+    id integer NOT NULL,
+    vehicle_type character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE mh_1_config_vehicle_type OWNER TO postgres;
+
+--
+-- Name: mh_1_config_vehicle_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_config_vehicle_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_config_vehicle_type_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_config_vehicle_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_config_vehicle_type_id_seq OWNED BY mh_1_config_vehicle_type.id;
+
+
+--
 -- Name: mh_1_map_household_address; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -687,6 +826,76 @@ CREATE TABLE mh_1_map_user_household (
 ALTER TABLE mh_1_map_user_household OWNER TO postgres;
 
 --
+-- Name: mh_1_people_document; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_people_document (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    document_id integer NOT NULL,
+    notes character varying
+);
+
+
+ALTER TABLE mh_1_people_document OWNER TO postgres;
+
+--
+-- Name: mh_1_people_document_attribute; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_people_document_attribute (
+    id integer NOT NULL,
+    doc_map_id integer NOT NULL,
+    attr_id integer NOT NULL,
+    attr_value character varying
+);
+
+
+ALTER TABLE mh_1_people_document_attribute OWNER TO postgres;
+
+--
+-- Name: mh_1_people_document_attribute_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_people_document_attribute_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_people_document_attribute_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_people_document_attribute_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_people_document_attribute_id_seq OWNED BY mh_1_people_document_attribute.id;
+
+
+--
+-- Name: mh_1_people_document_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_people_document_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_people_document_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_people_document_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_people_document_id_seq OWNED BY mh_1_people_document.id;
+
+
+--
 -- Name: mh_1_people_house_user; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -709,6 +918,131 @@ CREATE TABLE mh_1_people_house_user (
 
 
 ALTER TABLE mh_1_people_house_user OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_car; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_vehicle_car (
+    id integer NOT NULL,
+    year_produced character varying,
+    make character varying,
+    model character varying,
+    milage_purchased integer,
+    vin character varying NOT NULL,
+    milage_registered integer,
+    owned_by integer NOT NULL,
+    non_operational boolean DEFAULT false NOT NULL,
+    license_plate character varying
+);
+
+
+ALTER TABLE mh_1_vehicle_car OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_car_user_permission; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_vehicle_car_user_permission (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    car_id integer NOT NULL,
+    can_operate boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE mh_1_vehicle_car_user_permission OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_car_user_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_vehicle_car_user_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_vehicle_car_user_permission_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_car_user_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_vehicle_car_user_permission_id_seq OWNED BY mh_1_vehicle_car_user_permission.id;
+
+
+--
+-- Name: mh_1_vehicle_generic; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_vehicle_generic (
+    id integer NOT NULL,
+    type_id integer NOT NULL,
+    date_purchased date,
+    date_registered date DEFAULT (now())::date NOT NULL
+);
+
+
+ALTER TABLE mh_1_vehicle_generic OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_generic_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_vehicle_generic_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_vehicle_generic_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_generic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_vehicle_generic_id_seq OWNED BY mh_1_vehicle_generic.id;
+
+
+--
+-- Name: mh_1_vehicle_renewal; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mh_1_vehicle_renewal (
+    id integer NOT NULL,
+    vehicle_id integer NOT NULL,
+    renewal_date date NOT NULL,
+    renewal_amount money
+);
+
+
+ALTER TABLE mh_1_vehicle_renewal OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_renewal_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_vehicle_renewal_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_vehicle_renewal_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_vehicle_renewal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_vehicle_renewal_id_seq OWNED BY mh_1_vehicle_renewal.id;
+
 
 --
 -- Name: mh_default_accttype; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -833,7 +1167,70 @@ ALTER TABLE ONLY mh_1_config_accttype ALTER COLUMN id SET DEFAULT nextval('mh_1_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
+ALTER TABLE ONLY mh_1_config_document_attribute ALTER COLUMN id SET DEFAULT nextval('mh_1_config_document_attribute_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_document_type ALTER COLUMN id SET DEFAULT nextval('mh_1_config_document_type_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_map_doc_attribute ALTER COLUMN id SET DEFAULT nextval('mh_1_config_map_doc_attribute_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_vehicle_type ALTER COLUMN id SET DEFAULT nextval('mh_1_config_vehicle_type_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
 ALTER TABLE ONLY mh_1_myhouse_household ALTER COLUMN id SET DEFAULT nextval('mh_1_common_main_house_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document ALTER COLUMN id SET DEFAULT nextval('mh_1_people_document_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document_attribute ALTER COLUMN id SET DEFAULT nextval('mh_1_people_document_attribute_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car_user_permission ALTER COLUMN id SET DEFAULT nextval('mh_1_vehicle_car_user_permission_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_generic ALTER COLUMN id SET DEFAULT nextval('mh_1_vehicle_generic_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_renewal ALTER COLUMN id SET DEFAULT nextval('mh_1_vehicle_renewal_id_seq'::regclass);
 
 
 --
@@ -934,8 +1331,11 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 69, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
+37	pbkdf2_sha256$20000$u3iJtiQrxUut$v1Qc0QrgO3eDoWP+NiZB6EvTiMILS0nw0FeMA3uqP3w=	2015-09-03 11:27:04.108294-07	f	petros@test.com			petros@test.com	f	t	2015-09-03 11:06:58.898123-07
+24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-04 16:13:18.252301-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
+39	pbkdf2_sha256$20000$TjpBnjT9TIHn$KUuNvMG2JsGCy36XQQWMCjDl4eVjABvjKmTqEN+KVog=	\N	f	right@test.com			right@test.com	f	f	2015-09-04 16:15:10.130961-07
 33	pbkdf2_sha256$20000$jcaREeIuVt4y$e64SzbTPcyVhh6hn3PQB6+e5vmGz7llpGukrp4ThMOs=	2015-09-02 10:12:42.436486-07	f	poghos@test.com			poghos@test.com	f	t	2015-09-01 14:34:07.814296-07
-24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-02 10:13:07.598081-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
+38	pbkdf2_sha256$20000$HCXVepgwte7V$hlVtZqr01OIS9npRvw2obOdl9BS9LtM31HzQoNnC6ak=	\N	f	martiros@test.com			martiros@test.com	f	f	2015-09-03 11:25:56.02487-07
 21	pbkdf2_sha256$20000$S2Z4V1zJsMqg$u3oWDghu1FXRZAyp94iH+TiTntxOrMmpiVlk65v0kkw=	2015-09-01 12:48:07.161311-07	t	arsen			arsen.movsesyan@gmail.com	t	t	2015-09-01 11:59:37.014824-07
 \.
 
@@ -959,7 +1359,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 35, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 39, true);
 
 
 --
@@ -1071,7 +1471,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 23, true);
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
-la10fj11mq1wsvvccm6cyy96oc33l0mr	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE2NzJlODp7InVzZXJfaWQiOjI0LCJfYXV0aF91c2VyX2lkIjoiMjQiLCJob3VzZWhvbGRfaWQiOjYsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiYmVhMmYxYzIzMzJjNjEzODFkNTdjOWQ1NTU5ZDczYmJmMDRkMjBiYyIsInVzZXJfbmFtZSI6IkFyc2VuIn0=	2015-09-16 10:13:07.606873-07
+zok5cj603ptd2db2o83j7u9glmyx0fvy	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE2NzJlODp7InVzZXJfaWQiOjI0LCJfYXV0aF91c2VyX2lkIjoiMjQiLCJob3VzZWhvbGRfaWQiOjYsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiYmVhMmYxYzIzMzJjNjEzODFkNTdjOWQ1NTU5ZDczYmJmMDRkMjBiYyIsInVzZXJfbmFtZSI6IkFyc2VuIn0=	2015-09-18 16:13:18.260869-07
 \.
 
 
@@ -1079,8 +1479,15 @@ la10fj11mq1wsvvccm6cyy96oc33l0mr	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE
 -- Data for Name: mh_1_account_account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id, disabled, disabled_date, time_watch, access_login, access_password) FROM stdin;
-11	Google	2015-09-02	24	http://www.google.com	3	f	\N	f	aaa	sss
+COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, acct_type_id, disabled, disabled_date, time_watch, access_login, access_password, brief, description) FROM stdin;
+11	Google	2015-09-02	24	http://www.google.com	4	f	\N	f	aaa	sss		False
+12	Yahoo	2015-09-03	24	http://www.yahoo.com	2	f	\N	f	aaa	bbb		False
+13	PGE	2015-09-03	24	http://www.pge.com	1	f	\N	t	aaa	bbb	Electrical Utility	
+14	Comcast	2015-09-03	24	http://www.comcast.com	1	f	\N	t	aaa	bbb	Telecom	
+15	Main Bank	2015-09-03	24	http://www.chase.com	1	f	\N	t	aaa	bbb	Credit	
+16	Some Credit	2015-09-03	24	http://www.credit.com	1	f	\N	t	aaa	bbb	Another Credit	
+17	Mortgage	2015-09-03	24	http://www.chase.com	1	f	\N	t	aaa	bbb	Mortgage	
+18	Another Credit	2015-09-04	24	http://www.capitalone.com	1	f	\N	t	aaa	bbb	Yet another credit	
 \.
 
 
@@ -1088,7 +1495,7 @@ COPY mh_1_account_account (id, acct_name, create_date, created_by, login_url, ac
 -- Name: mh_1_account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_account_id_seq', 11, true);
+SELECT pg_catalog.setval('mh_1_account_account_id_seq', 18, true);
 
 
 --
@@ -1104,6 +1511,8 @@ COPY mh_1_account_attribute_value (account_id, attribute_id, value) FROM stdin;
 --
 
 COPY mh_1_account_payment_history (id, account_id, payment_date, payment_amount, confirmation_code) FROM stdin;
+2	14	2015-09-04	$10.00	lalala
+3	15	2015-09-04	$45.00	fff
 \.
 
 
@@ -1111,14 +1520,20 @@ COPY mh_1_account_payment_history (id, account_id, payment_date, payment_amount,
 -- Name: mh_1_account_payment_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_payment_history_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_account_payment_history_id_seq', 3, true);
 
 
 --
 -- Data for Name: mh_1_account_time_watch; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_time_watch (account_id, auto_payment, month_frequency, month_due_date, initial_payment_date) FROM stdin;
+COPY mh_1_account_time_watch (account_id, auto_payment, due_month_day, initial_payment_date, month_frequency) FROM stdin;
+13	f	1	\N	1
+14	f	5	\N	1
+15	f	10	\N	1
+16	f	15	\N	1
+17	f	20	\N	1
+18	t	4	\N	1
 \.
 
 
@@ -1127,7 +1542,38 @@ COPY mh_1_account_time_watch (account_id, auto_payment, month_frequency, month_d
 --
 
 COPY mh_1_account_user_permission (account_id, user_id, can_view, can_manage, can_edit, id) FROM stdin;
+12	33	t	t	f	7
+12	37	t	t	f	8
+12	38	t	t	f	9
 11	33	t	f	t	3
+11	37	t	t	t	5
+11	38	f	f	t	6
+13	33	t	t	f	10
+13	37	t	t	f	11
+13	38	t	t	f	12
+14	33	t	t	f	13
+14	37	t	t	f	14
+14	38	t	t	f	15
+15	33	t	t	f	16
+15	37	t	t	f	17
+15	38	t	t	f	18
+16	33	t	t	f	19
+16	37	t	t	f	20
+16	38	t	t	f	21
+17	33	t	t	f	22
+17	37	t	t	f	23
+17	38	t	t	f	24
+18	33	t	t	f	25
+18	37	t	t	f	26
+18	38	t	t	f	27
+11	39	t	t	f	28
+12	39	t	t	f	29
+13	39	t	f	f	30
+14	39	t	t	f	31
+15	39	t	t	t	32
+16	39	f	t	f	33
+17	39	t	f	f	34
+18	39	t	t	t	35
 \.
 
 
@@ -1135,7 +1581,7 @@ COPY mh_1_account_user_permission (account_id, user_id, can_view, can_manage, ca
 -- Name: mh_1_account_user_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 4, true);
+SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 35, true);
 
 
 --
@@ -1199,6 +1645,78 @@ SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 4, true);
 
 
 --
+-- Data for Name: mh_1_config_document_attribute; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_document_attribute (id, attribute, attribute_format) FROM stdin;
+5	Issue Date	DATE
+6	Valid Till	DATE
+7	Serial Number	STRING
+\.
+
+
+--
+-- Name: mh_1_config_document_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_document_attribute_id_seq', 7, true);
+
+
+--
+-- Data for Name: mh_1_config_document_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_document_type (id, document_type, description) FROM stdin;
+7	Passpot	Generic Document Type
+8	Driver License	Generic User ID
+\.
+
+
+--
+-- Name: mh_1_config_document_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_document_type_id_seq', 8, true);
+
+
+--
+-- Data for Name: mh_1_config_map_doc_attribute; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_map_doc_attribute (id, doc_type_id, attr_id, attached) FROM stdin;
+4	7	5	t
+5	7	6	t
+6	7	7	t
+7	8	5	t
+8	8	6	t
+9	8	7	t
+\.
+
+
+--
+-- Name: mh_1_config_map_doc_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_map_doc_attribute_id_seq', 9, true);
+
+
+--
+-- Data for Name: mh_1_config_vehicle_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_config_vehicle_type (id, vehicle_type, description) FROM stdin;
+1	Car	Generic vehicle type car
+\.
+
+
+--
+-- Name: mh_1_config_vehicle_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_config_vehicle_type_id_seq', 1, true);
+
+
+--
 -- Data for Name: mh_1_map_household_address; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1213,6 +1731,9 @@ COPY mh_1_map_household_address (ba_id, hh_id, comment) FROM stdin;
 COPY mh_1_map_user_household (user_id, household_id, hh_superuser) FROM stdin;
 24	6	t
 33	6	f
+37	6	f
+38	6	f
+39	6	f
 \.
 
 
@@ -1226,13 +1747,113 @@ COPY mh_1_myhouse_household (id, create_date) FROM stdin;
 
 
 --
+-- Data for Name: mh_1_people_document; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_people_document (id, user_id, document_id, notes) FROM stdin;
+\.
+
+
+--
+-- Data for Name: mh_1_people_document_attribute; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_people_document_attribute (id, doc_map_id, attr_id, attr_value) FROM stdin;
+\.
+
+
+--
+-- Name: mh_1_people_document_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_people_document_attribute_id_seq', 1, false);
+
+
+--
+-- Name: mh_1_people_document_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_people_document_id_seq', 1, false);
+
+
+--
 -- Data for Name: mh_1_people_house_user; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY mh_1_people_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, sex, first_name, last_name, email, title, suffix, created_by, disabled, disabled_at) FROM stdin;
 24	1970-02-21	123	45	6789	MALE	Arsen	Movsesyan	arsen@test.com	MR		24	f	\N
 33	1990-01-01	123	45	6789	MALE	Poghos	Petrosyan	poghos@test.com	MR		24	f	\N
+37	1997-01-01	123	45	6789	MALE	Petros	Poghosyan	petros@test.com	MR		24	f	\N
+38	1970-04-04	123	45	6789	MALE	Martiros	Martirosyan	martiros@test.com	MR		24	f	\N
+39	1990-04-04	123	45	6789	FEMALE	Always	Right	right@test.com	MRS		24	f	\N
 \.
+
+
+--
+-- Data for Name: mh_1_vehicle_car; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_vehicle_car (id, year_produced, make, model, milage_purchased, vin, milage_registered, owned_by, non_operational, license_plate) FROM stdin;
+5	2008	Nissan	Altima	830	9876543ABCDEFG	64000	24	f	6fmm197
+4	2004	Volkswagen	Passat	99000	12345678ABCDEFGH	156000	24	f	6fae958
+\.
+
+
+--
+-- Data for Name: mh_1_vehicle_car_user_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_vehicle_car_user_permission (id, user_id, car_id, can_operate) FROM stdin;
+1	33	4	t
+2	37	4	f
+3	38	4	f
+4	39	4	t
+5	33	5	t
+6	37	5	t
+7	38	5	t
+8	39	5	t
+\.
+
+
+--
+-- Name: mh_1_vehicle_car_user_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_vehicle_car_user_permission_id_seq', 8, true);
+
+
+--
+-- Data for Name: mh_1_vehicle_generic; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_vehicle_generic (id, type_id, date_purchased, date_registered) FROM stdin;
+4	1	2009-01-01	2015-09-05
+5	1	2008-06-25	2015-09-05
+\.
+
+
+--
+-- Name: mh_1_vehicle_generic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_vehicle_generic_id_seq', 5, true);
+
+
+--
+-- Data for Name: mh_1_vehicle_renewal; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY mh_1_vehicle_renewal (id, vehicle_id, renewal_date, renewal_amount) FROM stdin;
+1	5	2015-09-05	$108.00
+2	4	2015-01-01	$132.00
+\.
+
+
+--
+-- Name: mh_1_vehicle_renewal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_vehicle_renewal_id_seq', 2, true);
 
 
 --
@@ -1472,11 +2093,91 @@ ALTER TABLE ONLY mh_1_config_accttype
 
 
 --
+-- Name: mh_1_config_document_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_document_attribute
+    ADD CONSTRAINT mh_1_config_document_attribute_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_config_document_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_document_type
+    ADD CONSTRAINT mh_1_config_document_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_config_map_doc_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_map_doc_attribute
+    ADD CONSTRAINT mh_1_config_map_doc_attribute_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_config_vehicle_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_config_vehicle_type
+    ADD CONSTRAINT mh_1_config_vehicle_type_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: mh_1_map_household_address_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
 ALTER TABLE ONLY mh_1_map_household_address
     ADD CONSTRAINT mh_1_map_household_address_pkey PRIMARY KEY (ba_id);
+
+
+--
+-- Name: mh_1_people_document_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_people_document_attribute
+    ADD CONSTRAINT mh_1_people_document_attribute_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_people_document_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_people_document
+    ADD CONSTRAINT mh_1_people_document_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_vehicle_car_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car
+    ADD CONSTRAINT mh_1_vehicle_car_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_vehicle_car_user_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car_user_permission
+    ADD CONSTRAINT mh_1_vehicle_car_user_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_vehicle_generic_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_vehicle_generic
+    ADD CONSTRAINT mh_1_vehicle_generic_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mh_1_vehicle_renewal_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mh_1_vehicle_renewal
+    ADD CONSTRAINT mh_1_vehicle_renewal_pkey PRIMARY KEY (id);
 
 
 --
@@ -1739,6 +2440,22 @@ ALTER TABLE ONLY mh_1_people_house_user
 
 
 --
+-- Name: mh_1_config_map_doc_attribute_attr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_map_doc_attribute
+    ADD CONSTRAINT mh_1_config_map_doc_attribute_attr_id_fkey FOREIGN KEY (attr_id) REFERENCES mh_1_config_document_attribute(id);
+
+
+--
+-- Name: mh_1_config_map_doc_attribute_doc_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_config_map_doc_attribute
+    ADD CONSTRAINT mh_1_config_map_doc_attribute_doc_type_id_fkey FOREIGN KEY (doc_type_id) REFERENCES mh_1_config_document_type(id);
+
+
+--
 -- Name: mh_1_map_household_address_ba_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1752,6 +2469,86 @@ ALTER TABLE ONLY mh_1_map_household_address
 
 ALTER TABLE ONLY mh_1_map_household_address
     ADD CONSTRAINT mh_1_map_household_address_hh_id_fkey FOREIGN KEY (hh_id) REFERENCES mh_1_myhouse_household(id);
+
+
+--
+-- Name: mh_1_people_document_attribute_attr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document_attribute
+    ADD CONSTRAINT mh_1_people_document_attribute_attr_id_fkey FOREIGN KEY (attr_id) REFERENCES mh_1_config_map_doc_attribute(id);
+
+
+--
+-- Name: mh_1_people_document_attribute_doc_map_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document_attribute
+    ADD CONSTRAINT mh_1_people_document_attribute_doc_map_id_fkey FOREIGN KEY (doc_map_id) REFERENCES mh_1_people_document(id);
+
+
+--
+-- Name: mh_1_people_document_document_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document
+    ADD CONSTRAINT mh_1_people_document_document_id_fkey FOREIGN KEY (document_id) REFERENCES mh_1_config_document_type(id);
+
+
+--
+-- Name: mh_1_people_document_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_people_document
+    ADD CONSTRAINT mh_1_people_document_user_id_fkey FOREIGN KEY (user_id) REFERENCES mh_1_people_house_user(user_id);
+
+
+--
+-- Name: mh_1_vehicle_car_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car
+    ADD CONSTRAINT mh_1_vehicle_car_id_fkey FOREIGN KEY (id) REFERENCES mh_1_vehicle_generic(id);
+
+
+--
+-- Name: mh_1_vehicle_car_ovned_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car
+    ADD CONSTRAINT mh_1_vehicle_car_ovned_by_fkey FOREIGN KEY (owned_by) REFERENCES mh_1_people_house_user(user_id);
+
+
+--
+-- Name: mh_1_vehicle_car_user_permission_car_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car_user_permission
+    ADD CONSTRAINT mh_1_vehicle_car_user_permission_car_id_fkey FOREIGN KEY (car_id) REFERENCES mh_1_vehicle_car(id);
+
+
+--
+-- Name: mh_1_vehicle_car_user_permission_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_car_user_permission
+    ADD CONSTRAINT mh_1_vehicle_car_user_permission_user_id_fkey FOREIGN KEY (user_id) REFERENCES mh_1_people_house_user(user_id);
+
+
+--
+-- Name: mh_1_vehicle_generic_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_generic
+    ADD CONSTRAINT mh_1_vehicle_generic_type_id_fkey FOREIGN KEY (type_id) REFERENCES mh_1_config_vehicle_type(id);
+
+
+--
+-- Name: mh_1_vehicle_renewal_vehicle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_vehicle_renewal
+    ADD CONSTRAINT mh_1_vehicle_renewal_vehicle_id_fkey FOREIGN KEY (vehicle_id) REFERENCES mh_1_vehicle_generic(id);
 
 
 --

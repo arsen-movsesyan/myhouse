@@ -23,7 +23,7 @@
 {% endif %}
 {% for person in persons %}
     <tr>
-	<td>{{ person.user.first_name }}</td>
+	<td><a href="view/{{ person.user_id }}">{{ person.user.first_name }}</a></td>
 	<td>{{ person.user.last_name }}</td>
 	<td>{{ person.user.dob }}</td>
 	<td>{{ person.user.ssn_13 }}</td>

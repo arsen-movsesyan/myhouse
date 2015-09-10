@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from config.models import DocumentType,MapDocumentAttribute
+
 class HouseUser(models.Model):
     HUMAN_SEX = [('MALE',"Male"),('FEMALE',"Female")]
     HUMAN_TITLE = [
@@ -82,3 +84,24 @@ class MapUserHousehold(models.Model):
 	managed = False
 	db_table = "mh_{0}_map_user_household".format(settings.PROJECT_VERSION)
 
+
+class UserDocument(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(HouseUser,db_column='user_id')
+    document = models.ForeignKey(DocumentType,db_column='document_id')
+    notes = models.CharField(max_length=255,blank=True)
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_people_document".format(settings.PROJECT_VERSION)
+
+
+class UserDocAttribute(models.Model):
+    id = models.AutoField(primary_key=True)
+    doc_map = models.ForeignKey(UserDocument,db_column='doc_map_id')
+    attribute = models.ForeignKey(MapDocumentAttribute,db_column='attr_id')
+    attr_value = models.CharField(max_length=255,blank=True)
+
+    class Meta:
+	managed = False
+	db_table = "mh_{0}_people_document_attribute".format(settings.PROJECT_VERSION)

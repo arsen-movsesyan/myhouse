@@ -165,7 +165,7 @@ def edit_account(request,in_acct_id):
 #########################
 # First field is made by VoidWidget to display username AS part of form
 #########################
-	init_form_data={
+	init_form_data = {
 	    'id':access_map.pk,
 	    'user_name':house_user, # This is for display purposes
 	    'user_id':house_user.pk,

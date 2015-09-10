@@ -28,7 +28,7 @@
 
 {% for type in document_types %}
     <tr>
-	<td>{{ type.document_type }}</td>
+	<td><a href="/config/document/types/edit/{{ type.id }}">{{ type.document_type }}</a></td>
 	<td>{{ type.description }}</td>
     </tr>
 {% endfor %}

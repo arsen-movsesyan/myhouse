@@ -1,0 +1,26 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "people/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "people/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+
+<br><br>
+User <b>{{ view_user.first_name }} {{ view_user.last_name }}</b>
+<br><br>
+
+{% for doc in avail_docs %}
+    Assign <a href="assign_doc/{{ doc.id }}/">{{ doc.document_type }}</a><br>
+
+{% endfor %}
+
+{% endblock %}
+
+{% block right_pan %}
+    {% include "base/block_right_pan.html" %}
+{% endblock %}
