@@ -25,6 +25,7 @@ class AddVehicleCarForm(ModelForm):
 class VehicleCarUserPermissionForm(ModelForm):
     id = forms.CharField(widget=forms.HiddenInput,required=False)
     user_name = forms.CharField(widget=VoidWidget,required=False)
+    car_name = forms.CharField(widget=VoidWidget,required=False)
     user_id = forms.CharField(widget=forms.HiddenInput,required=False)
     vehicle_id = forms.CharField(widget=forms.HiddenInput,required=False)
 

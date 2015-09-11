@@ -80,7 +80,7 @@ def add_vehicle_car(request):
 		year_produced=in_form.cleaned_data['year_produced'],
 		make=in_form.cleaned_data['make'],
 		model=in_form.cleaned_data['model'],
-		license_plate=in_form.cleaned_data['license_plate'],
+		license_plate=in_form.cleaned_data['license_plate'].upper(),
 		milage_purchased=in_form.cleaned_data['milage_purchased'],
 		milage_registered=in_form.cleaned_data['milage_registered'],
 		vin=in_form.cleaned_data['vin'],
@@ -136,7 +136,7 @@ def edit_vehicle_car(request,in_vehicle_id):
 	    edit_vehicle.year_produced = in_form.cleaned_data['year_produced']
 	    edit_vehicle.make = in_form.cleaned_data['make']
 	    edit_vehicle.model = in_form.cleaned_data['model']
-	    edit_vehicle.license_plate = in_form.cleaned_data['license_plate']
+	    edit_vehicle.license_plate = in_form.cleaned_data['license_plate'].upper()
 	    edit_vehicle.milage_purchased = in_form.cleaned_data['milage_purchased']
 	    edit_vehicle.milage_registered = in_form.cleaned_data['milage_registered']
 	    edit_vehicle.vin = in_form.cleaned_data['vin']
@@ -155,11 +155,12 @@ def edit_vehicle_car(request,in_vehicle_id):
 	    template = loader.get_template('base/err_template.html')
 	    return HttpResponse(template.render({'form':in_form}))
     template = "vehicle/add_edit_vehicle.html"
-    in_form = AddVehicleCarForm(instance=edit_vehicle)
+    in_form = AddVehicleCarForm(instance=edit_vehicle,
+	    initial={'date_purchased':edit_vehicle.vehicle.date_purchased})
     init_formset_data = []
     
     for person in other:
-	map_obj = person.user.vehiclecaruserpermission_set.get(car=edit_vehicle)
+	map_obj = VehicleCarUserPermission.objects.filter(car=edit_vehicle).get(user_id=person.pk)
 	init_form_data={
 	    'id':map_obj.id,
 	    'user_name':map_obj.user, # This is for display purposes

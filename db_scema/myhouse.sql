@@ -427,11 +427,33 @@ ALTER SEQUENCE mh_1_account_account_id_seq OWNED BY mh_1_account_account.id;
 CREATE TABLE mh_1_account_attribute_value (
     account_id integer NOT NULL,
     attribute_id integer NOT NULL,
-    value character varying
+    value character varying,
+    id integer NOT NULL
 );
 
 
 ALTER TABLE mh_1_account_attribute_value OWNER TO postgres;
+
+--
+-- Name: mh_1_account_attribute_value_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mh_1_account_attribute_value_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mh_1_account_attribute_value_id_seq OWNER TO postgres;
+
+--
+-- Name: mh_1_account_attribute_value_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mh_1_account_attribute_value_id_seq OWNED BY mh_1_account_attribute_value.id;
+
 
 --
 -- Name: mh_1_account_payment_history; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -441,8 +463,9 @@ CREATE TABLE mh_1_account_payment_history (
     id integer NOT NULL,
     account_id integer NOT NULL,
     payment_date date NOT NULL,
-    payment_amount money NOT NULL,
-    confirmation_code character varying
+    payment_amount money,
+    confirmation_code character varying,
+    skip boolean
 );
 
 
@@ -478,7 +501,8 @@ CREATE TABLE mh_1_account_time_watch (
     auto_payment boolean DEFAULT false NOT NULL,
     due_month_day integer,
     initial_payment_date date,
-    month_frequency integer DEFAULT 1
+    month_frequency integer DEFAULT 1,
+    disabled boolean DEFAULT false NOT NULL
 );
 
 
@@ -669,7 +693,8 @@ ALTER SEQUENCE mh_1_config_accttype_id_seq OWNED BY mh_1_config_accttype.id;
 CREATE TABLE mh_1_config_document_attribute (
     id integer NOT NULL,
     attribute character varying NOT NULL,
-    attribute_format character varying
+    attribute_format character varying,
+    time_watch boolean DEFAULT false
 );
 
 
@@ -1045,20 +1070,6 @@ ALTER SEQUENCE mh_1_vehicle_renewal_id_seq OWNED BY mh_1_vehicle_renewal.id;
 
 
 --
--- Name: mh_default_accttype; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE mh_default_accttype (
-    id integer NOT NULL,
-    type_name character varying NOT NULL,
-    brief character varying NOT NULL,
-    description text
-);
-
-
-ALTER TABLE mh_default_accttype OWNER TO postgres;
-
---
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1126,6 +1137,13 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 --
 
 ALTER TABLE ONLY mh_1_account_account ALTER COLUMN id SET DEFAULT nextval('mh_1_account_account_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mh_1_account_attribute_value ALTER COLUMN id SET DEFAULT nextval('mh_1_account_attribute_value_id_seq'::regclass);
 
 
 --
@@ -1332,11 +1350,11 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 69, true);
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 37	pbkdf2_sha256$20000$u3iJtiQrxUut$v1Qc0QrgO3eDoWP+NiZB6EvTiMILS0nw0FeMA3uqP3w=	2015-09-03 11:27:04.108294-07	f	petros@test.com			petros@test.com	f	t	2015-09-03 11:06:58.898123-07
-24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-04 16:13:18.252301-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
 39	pbkdf2_sha256$20000$TjpBnjT9TIHn$KUuNvMG2JsGCy36XQQWMCjDl4eVjABvjKmTqEN+KVog=	\N	f	right@test.com			right@test.com	f	f	2015-09-04 16:15:10.130961-07
+21	pbkdf2_sha256$20000$S2Z4V1zJsMqg$u3oWDghu1FXRZAyp94iH+TiTntxOrMmpiVlk65v0kkw=	2015-09-11 13:26:29.809756-07	t	arsen			arsen.movsesyan@gmail.com	t	t	2015-09-01 11:59:37.014824-07
+24	pbkdf2_sha256$20000$b6w0DAO0tH3w$zk+PMhJw8lEhV8tXcKOEDJLUTvh2JeKNb78CtR009uU=	2015-09-11 13:30:03.691334-07	f	arsen@test.com			arsen@test.com	f	t	2015-09-01 12:49:17.237276-07
 33	pbkdf2_sha256$20000$jcaREeIuVt4y$e64SzbTPcyVhh6hn3PQB6+e5vmGz7llpGukrp4ThMOs=	2015-09-02 10:12:42.436486-07	f	poghos@test.com			poghos@test.com	f	t	2015-09-01 14:34:07.814296-07
 38	pbkdf2_sha256$20000$HCXVepgwte7V$hlVtZqr01OIS9npRvw2obOdl9BS9LtM31HzQoNnC6ak=	\N	f	martiros@test.com			martiros@test.com	f	f	2015-09-03 11:25:56.02487-07
-21	pbkdf2_sha256$20000$S2Z4V1zJsMqg$u3oWDghu1FXRZAyp94iH+TiTntxOrMmpiVlk65v0kkw=	2015-09-01 12:48:07.161311-07	t	arsen			arsen.movsesyan@gmail.com	t	t	2015-09-01 11:59:37.014824-07
 \.
 
 
@@ -1359,7 +1377,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 39, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 40, true);
 
 
 --
@@ -1386,6 +1404,8 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 2	2015-09-01 12:00:27.973184-07	20	poghos@petros.com	3		3	21
 3	2015-09-01 12:43:14.487197-07	22	arsen@test.com	3		3	21
 4	2015-09-01 12:48:14.562554-07	23	arsen@test.com	3		3	21
+5	2015-09-11 13:29:03.953747-07	8	DocumentType object	3		25	21
+6	2015-09-11 13:29:03.958378-07	7	DocumentType object	3		25	21
 \.
 
 
@@ -1393,7 +1413,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 4, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 6, true);
 
 
 --
@@ -1417,6 +1437,8 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 21	account	accountpaymenthistory
 22	people	household
 23	people	mapuserhousehold
+24	config	vehicletype
+25	config	documenttype
 \.
 
 
@@ -1424,7 +1446,7 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 23, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 25, true);
 
 
 --
@@ -1471,7 +1493,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 23, true);
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 iom43ne134ez26y6yyh0xyucmaoe9dxo	NTEwMGZiNzJiNzE2ZDg1OGE1ZjFkMjFmOTA3ZDVjOWZiMjVjMTc5Mjp7ImhvdXNlaG9sZCI6NCwiX2F1dGhfdXNlcl9oYXNoIjoiNTc3MzQ1OWM5MDE0NDliN2E3ZjIzMDhkMjU2ODkyNWYwMGQ5NTZjZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2015-09-11 11:15:05.97394-07
-zok5cj603ptd2db2o83j7u9glmyx0fvy	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE2NzJlODp7InVzZXJfaWQiOjI0LCJfYXV0aF91c2VyX2lkIjoiMjQiLCJob3VzZWhvbGRfaWQiOjYsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiYmVhMmYxYzIzMzJjNjEzODFkNTdjOWQ1NTU5ZDczYmJmMDRkMjBiYyIsInVzZXJfbmFtZSI6IkFyc2VuIn0=	2015-09-18 16:13:18.260869-07
+rrpe1tab4nom1894wu6kcttykn5ix71s	YzM1ODViZjI4NjhkMWMwNTZjMjk0NDU4ZjJlZGM4MjQwNWE2NzJlODp7InVzZXJfaWQiOjI0LCJfYXV0aF91c2VyX2lkIjoiMjQiLCJob3VzZWhvbGRfaWQiOjYsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiYmVhMmYxYzIzMzJjNjEzODFkNTdjOWQ1NTU5ZDczYmJmMDRkMjBiYyIsInVzZXJfbmFtZSI6IkFyc2VuIn0=	2015-09-25 13:30:03.700929-07
 \.
 
 
@@ -1502,17 +1524,26 @@ SELECT pg_catalog.setval('mh_1_account_account_id_seq', 18, true);
 -- Data for Name: mh_1_account_attribute_value; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_attribute_value (account_id, attribute_id, value) FROM stdin;
+COPY mh_1_account_attribute_value (account_id, attribute_id, value, id) FROM stdin;
 \.
+
+
+--
+-- Name: mh_1_account_attribute_value_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('mh_1_account_attribute_value_id_seq', 3, true);
 
 
 --
 -- Data for Name: mh_1_account_payment_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_payment_history (id, account_id, payment_date, payment_amount, confirmation_code) FROM stdin;
-2	14	2015-09-04	$10.00	lalala
-3	15	2015-09-04	$45.00	fff
+COPY mh_1_account_payment_history (id, account_id, payment_date, payment_amount, confirmation_code, skip) FROM stdin;
+2	14	2015-09-04	$10.00	lalala	\N
+3	15	2015-09-04	$45.00	fff	\N
+4	16	2015-09-11	$23.00	ABCDE	\N
+5	17	2015-09-11	$0.00	Void Acknowledged	t
 \.
 
 
@@ -1520,20 +1551,20 @@ COPY mh_1_account_payment_history (id, account_id, payment_date, payment_amount,
 -- Name: mh_1_account_payment_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_payment_history_id_seq', 3, true);
+SELECT pg_catalog.setval('mh_1_account_payment_history_id_seq', 5, true);
 
 
 --
 -- Data for Name: mh_1_account_time_watch; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_account_time_watch (account_id, auto_payment, due_month_day, initial_payment_date, month_frequency) FROM stdin;
-13	f	1	\N	1
-14	f	5	\N	1
-15	f	10	\N	1
-16	f	15	\N	1
-17	f	20	\N	1
-18	t	4	\N	1
+COPY mh_1_account_time_watch (account_id, auto_payment, due_month_day, initial_payment_date, month_frequency, disabled) FROM stdin;
+14	f	5	\N	1	f
+15	f	10	\N	1	f
+16	f	15	\N	1	f
+17	f	20	\N	1	f
+18	t	4	\N	1	f
+13	f	1	\N	1	f
 \.
 
 
@@ -1581,7 +1612,7 @@ COPY mh_1_account_user_permission (account_id, user_id, can_view, can_manage, ca
 -- Name: mh_1_account_user_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 35, true);
+SELECT pg_catalog.setval('mh_1_account_user_permission_id_seq', 43, true);
 
 
 --
@@ -1615,6 +1646,7 @@ COPY mh_1_config_acctattribute (id, attribute_name, description) FROM stdin;
 1	Account Number	For basic banking account numbers
 2	Routing Number	Banking Routing numbers
 3	Confirmation	For general purpose confirmations
+4	Serial Number	For Test purposes
 \.
 
 
@@ -1622,7 +1654,7 @@ COPY mh_1_config_acctattribute (id, attribute_name, description) FROM stdin;
 -- Name: mh_1_config_acctattribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_config_acctattribute_id_seq', 3, true);
+SELECT pg_catalog.setval('mh_1_config_acctattribute_id_seq', 4, true);
 
 
 --
@@ -1648,10 +1680,12 @@ SELECT pg_catalog.setval('mh_1_config_accttype_id_seq', 4, true);
 -- Data for Name: mh_1_config_document_attribute; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY mh_1_config_document_attribute (id, attribute, attribute_format) FROM stdin;
-5	Issue Date	DATE
-6	Valid Till	DATE
-7	Serial Number	STRING
+COPY mh_1_config_document_attribute (id, attribute, attribute_format, time_watch) FROM stdin;
+5	Issue Date	DATE	f
+7	Serial Number	STRING	f
+6	Valid Till	DATE	t
+8	Country of Residence	STRING	f
+9	Issued State	STRING	f
 \.
 
 
@@ -1659,7 +1693,7 @@ COPY mh_1_config_document_attribute (id, attribute, attribute_format) FROM stdin
 -- Name: mh_1_config_document_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_config_document_attribute_id_seq', 7, true);
+SELECT pg_catalog.setval('mh_1_config_document_attribute_id_seq', 9, true);
 
 
 --
@@ -1667,8 +1701,8 @@ SELECT pg_catalog.setval('mh_1_config_document_attribute_id_seq', 7, true);
 --
 
 COPY mh_1_config_document_type (id, document_type, description) FROM stdin;
-7	Passpot	Generic Document Type
-8	Driver License	Generic User ID
+9	Passport	Generic Document Type
+10	Driver License	US person ID
 \.
 
 
@@ -1676,7 +1710,7 @@ COPY mh_1_config_document_type (id, document_type, description) FROM stdin;
 -- Name: mh_1_config_document_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_config_document_type_id_seq', 8, true);
+SELECT pg_catalog.setval('mh_1_config_document_type_id_seq', 10, true);
 
 
 --
@@ -1684,12 +1718,16 @@ SELECT pg_catalog.setval('mh_1_config_document_type_id_seq', 8, true);
 --
 
 COPY mh_1_config_map_doc_attribute (id, doc_type_id, attr_id, attached) FROM stdin;
-4	7	5	t
-5	7	6	t
-6	7	7	t
-7	8	5	t
-8	8	6	t
-9	8	7	t
+10	9	5	t
+11	9	7	t
+12	9	6	t
+13	9	8	t
+14	9	9	f
+15	10	5	t
+16	10	7	t
+17	10	6	t
+18	10	8	f
+19	10	9	t
 \.
 
 
@@ -1697,7 +1735,7 @@ COPY mh_1_config_map_doc_attribute (id, doc_type_id, attr_id, attached) FROM std
 -- Name: mh_1_config_map_doc_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_config_map_doc_attribute_id_seq', 9, true);
+SELECT pg_catalog.setval('mh_1_config_map_doc_attribute_id_seq', 19, true);
 
 
 --
@@ -1751,6 +1789,8 @@ COPY mh_1_myhouse_household (id, create_date) FROM stdin;
 --
 
 COPY mh_1_people_document (id, user_id, document_id, notes) FROM stdin;
+4	24	9	
+5	24	10	
 \.
 
 
@@ -1759,6 +1799,14 @@ COPY mh_1_people_document (id, user_id, document_id, notes) FROM stdin;
 --
 
 COPY mh_1_people_document_attribute (id, doc_map_id, attr_id, attr_value) FROM stdin;
+7	4	6	2015-12-31
+8	4	5	2000-01-01
+9	4	7	ABCDE12345
+10	4	8	USA
+11	5	6	2016-05-01
+12	5	5	2008-05-01
+13	5	9	CALIFORNIA
+14	5	7	12345ABCDE
 \.
 
 
@@ -1766,14 +1814,14 @@ COPY mh_1_people_document_attribute (id, doc_map_id, attr_id, attr_value) FROM s
 -- Name: mh_1_people_document_attribute_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_people_document_attribute_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_people_document_attribute_id_seq', 14, true);
 
 
 --
 -- Name: mh_1_people_document_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('mh_1_people_document_id_seq', 1, false);
+SELECT pg_catalog.setval('mh_1_people_document_id_seq', 5, true);
 
 
 --
@@ -1794,8 +1842,8 @@ COPY mh_1_people_house_user (user_id, dob, ssn_13, ssn_45, ssn_69, sex, first_na
 --
 
 COPY mh_1_vehicle_car (id, year_produced, make, model, milage_purchased, vin, milage_registered, owned_by, non_operational, license_plate) FROM stdin;
-5	2008	Nissan	Altima	830	9876543ABCDEFG	64000	24	f	6fmm197
-4	2004	Volkswagen	Passat	99000	12345678ABCDEFGH	156000	24	f	6fae958
+5	2008	Nissan	Altima	830	9876543ABCDEFG	64000	24	f	6FMM197
+4	2004	Volkswagen	Passat	99000	12345678ABCDEFGH	156000	24	f	6FAE962
 \.
 
 
@@ -1804,14 +1852,14 @@ COPY mh_1_vehicle_car (id, year_produced, make, model, milage_purchased, vin, mi
 --
 
 COPY mh_1_vehicle_car_user_permission (id, user_id, car_id, can_operate) FROM stdin;
-1	33	4	t
-2	37	4	f
-3	38	4	f
-4	39	4	t
 5	33	5	t
 6	37	5	t
 7	38	5	t
 8	39	5	t
+1	33	4	t
+2	37	4	f
+3	38	4	f
+4	39	4	t
 \.
 
 
@@ -1854,18 +1902,6 @@ COPY mh_1_vehicle_renewal (id, vehicle_id, renewal_date, renewal_amount) FROM st
 --
 
 SELECT pg_catalog.setval('mh_1_vehicle_renewal_id_seq', 2, true);
-
-
---
--- Data for Name: mh_default_accttype; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY mh_default_accttype (id, type_name, brief, description) FROM stdin;
-1	Financial	Stores financial info	For all financial account types including banks, online stores and services required credit or debit card
-2	Social	For social networks	Accounts like "Facebook", "LinkedIn", etc.
-3	Basic	General Purpose accounts	
-4	Other	For all unclassified accounts	
-\.
 
 
 --
@@ -2017,7 +2053,7 @@ ALTER TABLE ONLY mh_1_account_account
 --
 
 ALTER TABLE ONLY mh_1_account_attribute_value
-    ADD CONSTRAINT mh_1_account_attribute_value_pkey PRIMARY KEY (account_id);
+    ADD CONSTRAINT mh_1_account_attribute_value_pkey PRIMARY KEY (id);
 
 
 --
@@ -2178,14 +2214,6 @@ ALTER TABLE ONLY mh_1_vehicle_generic
 
 ALTER TABLE ONLY mh_1_vehicle_renewal
     ADD CONSTRAINT mh_1_vehicle_renewal_pkey PRIMARY KEY (id);
-
-
---
--- Name: mh_default_accttype_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY mh_default_accttype
-    ADD CONSTRAINT mh_default_accttype_pkey PRIMARY KEY (id);
 
 
 --
@@ -2476,7 +2504,7 @@ ALTER TABLE ONLY mh_1_map_household_address
 --
 
 ALTER TABLE ONLY mh_1_people_document_attribute
-    ADD CONSTRAINT mh_1_people_document_attribute_attr_id_fkey FOREIGN KEY (attr_id) REFERENCES mh_1_config_map_doc_attribute(id);
+    ADD CONSTRAINT mh_1_people_document_attribute_attr_id_fkey FOREIGN KEY (attr_id) REFERENCES mh_1_config_document_attribute(id);
 
 
 --

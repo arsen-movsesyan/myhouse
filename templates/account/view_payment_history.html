@@ -16,6 +16,7 @@ Payment history for {{ account.account.acct_name }}<br><br>
 	<td class="small_header">Date</td>
 	<td class="small_header">Amount</td>
 	<td class="small_header">Confirmation</td>
+	<td class="small_header">&nbsp;</td>
     </tr>
 
 {% for payment in payments %}
@@ -23,6 +24,13 @@ Payment history for {{ account.account.acct_name }}<br><br>
 	<td>{{ payment.payment_date }}</td>
 	<td>{{ payment.payment_amount }}</td>
 	<td>{{ payment.confirmation_code }}</td>
+	<td>
+{% if payment.skip %}
+    Skiped
+{% else %}
+    &nbsp;
+{% endif %}
+</td>
     </tr>
 {% endfor %}
 </table>

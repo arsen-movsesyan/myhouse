@@ -10,6 +10,7 @@ urlpatterns = patterns('',
 
     url(r'add$',views.add_account),
     url(r'view/(?P<in_acct_id>\d+)$',views.view_account),
+    url(r'view/(?P<in_acct_id>\d+)/attribute_delete/(?P<in_attr_map_id>\d+)$',views.account_attribute_delete),
     url(r'edit/(?P<in_acct_id>\d+)$',views.edit_account),
     url(r'delete/(?P<in_acct_id>\d+)$',views.delete_account),
     url(r'time_watch/(?P<in_acct_id>\d+)$',views.make_time_watch),

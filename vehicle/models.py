@@ -51,7 +51,7 @@ class VehicleCar(models.Model):
 
 class VehicleCarUserPermission(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(HouseUser,db_column='user_id')
+    user = models.ForeignKey(HouseUser,db_column='user_id',related_name='permission_cars')
     car = models.ForeignKey(VehicleCar,db_column='car_id')
     can_operate = models.BooleanField()
 

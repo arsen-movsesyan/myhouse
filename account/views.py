@@ -7,7 +7,9 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 
 from account.forms import AddEditAccountForm,TimeWatchForm,AccessFormSet,AccountPaymentForm
+from account.forms import AccountAttributeValueForm
 from account.models import Account,AccountUserPermission,AccountTimeWatch,AccountPaymentHistory
+from account.models import AccountAttributeValue
 from config.models import AccountType
 from people.models import HouseUser
 
@@ -34,12 +36,39 @@ def view_accounts(request,view_filter='active'):
 
 @login_required
 def view_account(request,in_acct_id):
+    in_form = AccountAttributeValueForm(request.POST or None)
     account = Account.objects.get(pk=in_acct_id)
-    template = loader.get_template("account/view_account.html")
+    if request.method =='POST':
+	if in_form.is_valid():
+	    attribute = in_form.cleaned_data['attribute']
+	    value = in_form.cleaned_data['value']
+	    new_attr = AccountAttributeValue.objects.create(
+		account = account,
+		attribute = attribute,
+		value = value
+	    )
+#	    print in_form.cleaned_data
+	    return HttpResponseRedirect("/account/view/"+in_acct_id)
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+
+    template = "account/view_account.html"
+    
     context=dict()
+    attributes = account.attributes.all()
     context['account'] = account
+    context['attributes'] = attributes
+    context['form'] = in_form
     context['username'] = request.session['user_name']
-    return HttpResponse(template.render(context))
+    return render(request,template,context)
+
+
+@login_required
+def account_attribute_delete(request,in_acct_id,in_attr_map_id):
+    attr_map = AccountAttributeValue.objects.get(pk=in_attr_map_id)
+    attr_map.delete()
+    return HttpResponseRedirect("/account/view/{0}".format(in_acct_id))
 
 
 
@@ -194,6 +223,8 @@ def view_time_watch(request):
     ret_array = []
     accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
     for acct_obj in accounts:
+	if acct_obj.t_watch.disabled:
+	    continue
 	info = dict()
 	info['obj'] = acct_obj
 	d_d_d=acct_obj.t_watch.get_due_date()
@@ -216,13 +247,17 @@ def make_time_watch(request,in_acct_id):
     if request.method == 'POST':
 	in_form = TimeWatchForm(request.POST)
 	if in_form.is_valid():
-	    print in_form.cleaned_data
-	    edit_account.time_watch = True
-	    edit_account.save()
-	    new_time_watch = AccountTimeWatch.objects.create(
-		account = edit_account,
-		auto_payment = in_form.cleaned_data['auto_payment']
-	    )
+	    if edit_account.time_watch == True:
+		new_time_watch = edit_account.t_watch
+		new_time_watch.disabled = in_form.cleaned_data['disabled']
+		new_time_watch.auto_payment = in_form.cleaned_data['auto_payment']
+	    else:
+		edit_account.time_watch = True
+		edit_account.save()
+		new_time_watch = AccountTimeWatch.objects.create(
+		    account = edit_account,
+		    auto_payment = in_form.cleaned_data['auto_payment']
+		)
 	    if 'month_frequency' in in_form.cleaned_data:
 		new_time_watch.month_frequency = in_form.cleaned_data['month_frequency']
 	    if 'due_month_day' in in_form.cleaned_data:
@@ -230,12 +265,13 @@ def make_time_watch(request,in_acct_id):
 	    if 'initial_payment_date' in in_form.cleaned_data:
 		new_time_watch.initial_payment_date = in_form.cleaned_data['initial_payment_date']
 	    new_time_watch.save()
+
 	    return HttpResponseRedirect("/account/")
 	else:
 	    template = loader.get_template('base/err_template.html')
 	    return HttpResponse(template.render({'form':in_form}))
     template = "account/make_timewatch.html"    
-    in_form = TimeWatchForm(instance=edit_account)
+    in_form = TimeWatchForm(instance=edit_account.t_watch)
     context = {'form':in_form}
     context['username'] = request.session['user_name']
     return render(request,template,context)
@@ -248,14 +284,15 @@ def acknowledge(request,in_acct_id):
 	in_form = AccountPaymentForm(request.POST)
 	if in_form.is_valid():
 	    payment_history = AccountPaymentHistory.objects.create(
-		account = account,
-		payment_date = in_form.cleaned_data['payment_date'],
-		payment_amount = in_form.cleaned_data['payment_amount']
+		account=account,
+		payment_date=in_form.cleaned_data['payment_date'],
+		skip=in_form.cleaned_data['skip']
 	    )
-	    if in_form.cleaned_data['skip_this_time']:
+	    if in_form.cleaned_data['skip']:
 		payment_history.confirmation_code = 'Void Acknowledged'
 	    else:
 		payment_history.confirmation_code = in_form.cleaned_data['confirmation_code']
+		payment_history.payment_amount = in_form.cleaned_data['payment_amount']
 	    payment_history.save() 
 	    return HttpResponseRedirect("/account/view_time_watch")
 	else:

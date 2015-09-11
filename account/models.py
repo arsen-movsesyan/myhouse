@@ -55,9 +55,10 @@ class AccountUserPermission(models.Model):
 
 
 class AccountAttributeValue(models.Model):
-    account = models.OneToOneField(Account,
+    id =  models.AutoField(primary_key=True)
+#    account = models.OneToOneField(Account,
+    account = models.ForeignKey(Account,
 	db_column='account_id',
-	primary_key=True,
 	related_name='attributes')
     attribute = models.ForeignKey(AccountAttribute,
 	db_column='attribute_id')
@@ -78,6 +79,7 @@ class AccountTimeWatch(models.Model):
     month_frequency = models.IntegerField(blank=True,default=1)
     due_month_day = models.IntegerField(blank=True)
     initial_payment_date = models.DateField(blank=True,null=True)
+    disabled = models.BooleanField(default=False)
 
     class Meta:
 	managed = False
@@ -131,8 +133,9 @@ class AccountPaymentHistory(models.Model):
 	related_name='payment_history')
     payment_date = models.DateField(default=timezone.now)
 #    payment_date = models.DateField(default=date.today())
-    payment_amount = models.CharField(max_length=30)
+    payment_amount = models.CharField(max_length=30,blank=True)
     confirmation_code = models.CharField(max_length=255,blank=True)
+    skip = models.BooleanField(blank=True)
 
     class Meta:
 	managed = False

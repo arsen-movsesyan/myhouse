@@ -72,7 +72,7 @@ class DynamicForm(forms.Form):
 
     def _add_field(self,in_field_name,in_type,in_value=None):
 	if in_type == 'DATE':
-	    self.fields["%s" % in_field_name] = forms.DateField(label=in_field_name)
+	    self.fields["%s" % in_field_name] = forms.DateField()
 	elif in_type == 'INTEGER':
 	    self.fields["%s" % in_field_name] = forms.IntegerField()
 	elif in_type == 'STRING':

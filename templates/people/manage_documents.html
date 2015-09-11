@@ -19,12 +19,13 @@ User <b>{{ view_user.first_name }} {{ view_user.last_name }}</b>
 
 {% endfor %}
 
-<br><br>
+<br><hr>
 {% for my_doc in my_docs %}
     Document: <b>{{ my_doc.document.document_type }}</b><br>
     {% for attr in my_doc.attributes.all %}
-	Attribute <b>{{ attr.attribute.attribute }}</b> Value <b>{{ attr.attr_value }}</b><br>
+	Attribute: <b>{{ attr.attribute.attribute }}</b> Value: <b>{{ attr.attr_value }}</b><br>
     {% endfor %}
+<hr>
 {% endfor %}
 
 {% endblock %}

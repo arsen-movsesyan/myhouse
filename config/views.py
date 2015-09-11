@@ -220,6 +220,7 @@ def edit_document_type(request,in_doc_type_id):
     template = "config/add_edit_doc_type.html"
     context = dict()
     init_formset_data = []
+#    for map_obj in doc_attributes.all():
     for map_obj in doc_attributes.all():
 	init_form_data = {
 	    'map_id':map_obj.id,
@@ -232,8 +233,6 @@ def edit_document_type(request,in_doc_type_id):
     context['map_formset'] = map_formset
     context['username'] = request.session['user_name']
     return render(request,template,context)
-
-
 
 
 @login_required

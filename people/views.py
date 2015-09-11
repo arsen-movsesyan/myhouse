@@ -16,7 +16,8 @@ from config.forms import DynamicForm
 from account.models import Account,AccountUserPermission
 from account.forms import AccessFormSet
 
-
+from vehicle.models import VehicleCar,VehicleCarUserPermission
+from vehicle.forms import OperateFormSet
 
 @login_required
 def edit_profile(request):
@@ -43,12 +44,12 @@ def edit_profile(request):
 	    return HttpResponse(template.render({'form':in_form}))
     template = 'people/edit_profile.html'
     context = dict()
-    my_ssn = main_user.get_complete_ssn(clear=False)
-    in_form = AddEditUserForm(instance=main_user,
+    my_ssn = house_user.get_complete_ssn(clear=False)
+    in_form = AddEditUserForm(instance=house_user,
 	initial={'login_enabled':True,'complete_ssn':my_ssn,
 	'can_login':True,
-	'hh_superuser':main_user.user_map.hh_superuser,})
-    context['user'] = main_user
+	'hh_superuser':house_user.user_map.hh_superuser,})
+    context['user'] = house_user
     context['form'] = in_form
     context['username'] = request.session['user_name']
     return render(request,template,context)
@@ -73,10 +74,12 @@ def add_person(request):
 ########################
 # This should be changed to all accounts for this household
     accounts = Account.objects.filter(created_by=house_user)
+    cars = VehicleCar.objects.filter(owned_by=house_user)
     if request.method == 'POST':
 	in_form = AddEditUserForm(request.POST)
-	access_formset = AccessFormSet(request.POST)
-	if in_form.is_valid() and access_formset.is_valid():
+	account_access_formset = AccessFormSet(request.POST)
+	car_access_formset = OperateFormSet(request.POST)
+	if in_form.is_valid() and access_formset.is_valid() and car_access_formset.is_valid():
 	    email = in_form.cleaned_data['email']
 	    username = email
 ##########################
@@ -114,18 +117,27 @@ def add_person(request):
 	    if 'hh_superuser' in in_form.cleaned_data:
 		map_obj.hh_superuser = in_form.cleaned_data['hh_superuser']
 	    map_obj.save()
-	    for access_form in access_formset:
-		acct_pk = int(access_form.cleaned_data['account_id'])
-		can_edit = access_form.cleaned_data['can_edit']
-		can_view = access_form.cleaned_data['can_view']
-		can_manage = access_form.cleaned_data['can_manage']
+	    for acct_access_form in account_access_formset:
+		acct_pk = int(acct_access_form.cleaned_data['account_id'])
+		can_edit = acct_access_form.cleaned_data['can_edit']
+		can_view = acct_access_form.cleaned_data['can_view']
+		can_manage = acct_access_form.cleaned_data['can_manage']
 		access_account = Account.objects.get(pk=acct_pk)
-		access_map = AccountUserPermission.objects.create(
+		acct_access_map = AccountUserPermission.objects.create(
 		    account = access_account,
 		    user = new_user,
 		    can_view = can_view,
 		    can_manage = can_manage,
 		    can_edit =can_edit
+		)
+	    for car_access_form in car_access_formset:
+		car_pk = int(car_access_form.cleaned_data['vehicle_id'])
+		can_operate = car_access_form.cleaned_data['can_operate']
+		access_car = VehicleCar.objects.get(pk=car_pk)
+		car_access_map = VehicleCarUserPermission.objects.create(
+		    user = new_user,
+		    car = access_car,
+		    can_operate = can_operate
 		)
 	    return HttpResponseRedirect("/people/")
 	else:
@@ -135,18 +147,29 @@ def add_person(request):
     template = "people/add_edit_user.html"
     in_form = AddEditUserForm(initial={'login_enabled':True})
 
-    init_formset_data = []
+    account_init_formset_data = []
     for account in accounts:
-	init_form_data={
+	init_form_data = {
 	    'account_id':account.pk,
 	    'account_name':account.acct_name,
 	    'can_view':True,
 	    'can_manage':True,
 	    'can_edit':False}
-	init_formset_data.append(init_form_data)
+	account_init_formset_data.append(init_form_data)
+    account_access_formset = AccessFormSet(initial=account_init_formset_data)
 
-    access_formset = AccessFormSet(initial=init_formset_data)
-    context = {'form':in_form,'access_formset':access_formset}
+    car_init_formset_data = []
+    for car in cars:
+	init_form_data = {
+	    'car_name':car.make+' '+car.model,
+	    'vehicle_id':car.pk,
+	    'can_operate':True
+	}
+	car_init_formset_data.append(init_form_data)
+    car_access_formset = OperateFormSet(initial=car_init_formset_data)
+
+    context = {'form':in_form,'account_access_formset':account_access_formset}
+    context['car_access_formset'] = car_access_formset
     context['username'] = request.session['user_name']
     return render(request,template,context)
 
@@ -162,10 +185,12 @@ def edit_person(request,in_user_id):
 ########################
 # This should be changed to all accounts for this household
     accounts = Account.objects.filter(created_by=house_user)
+    cars = VehicleCar.objects.filter(owned_by=house_user)
     if request.method == 'POST':
 	in_form = AddEditUserForm(request.POST)
-	access_formset = AccessFormSet(request.POST)
-	if in_form.is_valid() and access_formset.is_valid():
+	account_access_formset = AccessFormSet(request.POST)
+	car_access_formset = OperateFormSet(request.POST)
+	if in_form.is_valid() and access_formset.is_valid() and car_access_formset.is_valid():
 
 	    edit_auth_user.email = in_form.cleaned_data['email']
 	    edit_auth_user.username = in_form.cleaned_data['email']
@@ -189,17 +214,24 @@ def edit_person(request,in_user_id):
 	    if 'hh_superuser' in in_form.cleaned_data:
 		map_obj.hh_superuser = in_form.cleaned_data['hh_superuser']
 		map_obj.save()
-	    for access_form in access_formset:
-		access_map_pk = int(access_form.cleaned_data['id'])
-		can_edit = access_form.cleaned_data['can_edit']
-		can_view = access_form.cleaned_data['can_view']
-		can_manage = access_form.cleaned_data['can_manage']
+	    for acct_access_form in account_access_formset:
+		access_map_pk = int(acct_access_form.cleaned_data['id'])
+		can_edit = acct_access_form.cleaned_data['can_edit']
+		can_view = acct_access_form.cleaned_data['can_view']
+		can_manage = acct_access_form.cleaned_data['can_manage']
 
 		access_map = AccountUserPermission.objects.get(pk=access_map_pk)
 		access_map.can_view = can_view
 		access_map.can_manage = can_manage
 		access_map.can_edit = can_edit
 		access_map.save()
+	    for car_access_form in car_access_formset:
+		access_map_pk = int(car_access_form.cleaned_data['id'])
+		can_operate = car_access_form.cleaned_data['can_operate']
+		access_map = VehicleCarUserPermission.objects.get(pk=access_map_pk)
+		access_map.can_operate = can_operate
+		access_map.save()
+
 	    return HttpResponseRedirect("/people/")
 	else:
 	    template = loader.get_template('base/err_template.html')
@@ -210,19 +242,30 @@ def edit_person(request,in_user_id):
 	initial={'can_login':edit_auth_user.is_active,
 	    'complete_ssn':edit_house_user.get_complete_ssn(clear=False),
 	    'hh_superuser':map_obj.hh_superuser})
-    init_formset_data = []
+    account_init_formset_data = []
     for account in accounts:
 	access_map = AccountUserPermission.objects.filter(account=account).get(user=edit_house_user)
 	init_form_data={
 	    'id':access_map.pk,
-#	    'account_id':account.pk,
 	    'account_name':account.acct_name,
 	    'can_view':access_map.can_view,
 	    'can_manage':access_map.can_manage,
 	    'can_edit':access_map.can_edit}
-	init_formset_data.append(init_form_data)
-    access_formset = AccessFormSet(initial=init_formset_data)
-    context = {'form':in_form,'access_formset':access_formset}
+	account_init_formset_data.append(init_form_data)
+    account_access_formset = AccessFormSet(initial=account_init_formset_data)
+
+    car_init_formset_data = []
+    for car in cars:
+	access_map = VehicleCarUserPermission.objects.filter(car=car).get(user=edit_house_user)
+	init_form_data={
+	    'id':access_map.pk,
+	    'can_operate':access_map.can_operate
+	}
+	car_init_formset_data.append(init_form_data)
+
+    car_access_formset = OperateFormSet(initial=car_init_formset_data)
+    context = {'form':in_form,'account_access_formset':account_access_formset}
+    context['car_access_formset'] = car_access_formset
     context['username'] = request.session['user_name']
     return render(request,template,context)
 

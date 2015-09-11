@@ -23,15 +23,19 @@
 {% endif %}
 {% for person in persons %}
     <tr>
-	<td><a href="view/{{ person.user_id }}">{{ person.user.first_name }}</a></td>
+	<td><a class="noticable" href="view/{{ person.user_id }}">{{ person.user.first_name }}</a></td>
 	<td>{{ person.user.last_name }}</td>
 	<td>{{ person.user.dob }}</td>
 	<td>{{ person.user.ssn_13 }}</td>
 	<td>{{ person.user.auth_user.is_active }}</td>
-{% if house_user.user_map.hh_superuser %} 
+{% if house_user.user_map.hh_superuser %}
 	<td>
+	{% if person.user == house_user %}
+	    &nbsp;
+	{% else %}
 	    <a href="edit/{{ person.user.auth_user_id }}">Edit</a>
 	    <a href="delete/{{ person.user.auth_user_id }}">Delete</a>
+	{% endif %}
 	</td>
 {% endif %}
     </tr>

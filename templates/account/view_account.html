@@ -41,10 +41,25 @@
     <tr>
 	<td>Attribute</td>
 	<td>Value</td>
+	<td>Action</td>
     </tr>
+{% for attr in attributes %}
+    <tr>
+	<td>{{ attr.attribute }}</td>
+	<td>{{ attr.value }}</td>
+	<td><a href="/account/view/{{ account.id }}/attribute_delete/{{ attr.id }}">Delete</a></td>
+    </tr>
+{% endfor %}
+<form method="post">
+{% csrf_token %}
+    {{ form.as_table }}
 
-
-
+    <tr>
+	<td colspan=2 align="center">
+<input type="submit" value="Submit">
+	</td>
+    </tr>
+</form>
 </table>
 
 	</td>
