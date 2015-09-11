@@ -253,8 +253,9 @@ def add_doc_attribute(request):
 	in_form = AddDocumentAttributeForm(request.POST)
 	if in_form.is_valid():
 	    new_doc_attribute = DocumentAttribute.objects.create(
-		attribute = in_form.cleaned_data['attribute'],
-		attribute_format = in_form.cleaned_data['attribute_format']
+		attribute=in_form.cleaned_data['attribute'],
+		attribute_format=in_form.cleaned_data['attribute_format'],
+		time_watch=in_form.cleaned_data['time_watch']
 	    )
 	    return HttpResponseRedirect("/config/document/attributes/")
 	else:

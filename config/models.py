@@ -57,6 +57,7 @@ class DocumentAttribute(models.Model):
 	blank=True,
 	choices=ATTRIBUTE_FORMAT,
 	default='STRING')
+    time_watch = models.BooleanField()
 
     class Meta:
 	managed = False

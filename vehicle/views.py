@@ -143,7 +143,6 @@ def edit_vehicle_car(request,in_vehicle_id):
 	    edit_vehicle.save()
 
 	    for operate_form in operate_formset:
-		print operate_form.cleaned_data
 		map_pk = int(operate_form.cleaned_data['id'])
 		can_operate = operate_form.cleaned_data['can_operate']
 		operate_map = VehicleCarUserPermission.objects.get(pk=map_pk)

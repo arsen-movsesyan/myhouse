@@ -22,4 +22,3 @@ class AddEditUserForm(ModelForm):
 	    complete_ssn = cleaned_data['complete_ssn']
 	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
 		self.add_error('complete_ssn',"Invalid ssn provided")
-

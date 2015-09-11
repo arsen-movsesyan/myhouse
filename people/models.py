@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from config.models import DocumentType,MapDocumentAttribute
+from datetime import date,datetime
+from config.models import DocumentType,DocumentAttribute
 
 class HouseUser(models.Model):
     HUMAN_SEX = [('MALE',"Male"),('FEMALE',"Female")]
@@ -62,9 +63,24 @@ class HouseUser(models.Model):
 	return other_users
 
 
+    def get_timewatch_documents(self):
+	my_docs = self.userdocument_set.all()
+	ret = []
+	for doc in my_docs:
+	    attrs = doc.attributes.all()
+	    for attr in attrs:
+		if attr.attribute.time_watch:
+		    tw = dict()
+		    tw['doc'] = doc
+		    tw['attr'] = attr
+		    tw['value'] =  datetime.strptime(attr.attr_value,"%Y-%m-%d").date()
+		    ret.append(tw)
+	return ret
+
 class Household(models.Model):
     id = models.AutoField(primary_key=True)
     create_date = models.DateField(auto_now_add=True)
+
 
     class Meta:
 	managed = False
@@ -98,8 +114,8 @@ class UserDocument(models.Model):
 
 class UserDocAttribute(models.Model):
     id = models.AutoField(primary_key=True)
-    doc_map = models.ForeignKey(UserDocument,db_column='doc_map_id')
-    attribute = models.ForeignKey(MapDocumentAttribute,db_column='attr_id')
+    doc_map = models.ForeignKey(UserDocument,db_column='doc_map_id',related_name='attributes')
+    attribute = models.ForeignKey(DocumentAttribute,db_column='attr_id')
     attr_value = models.CharField(max_length=255,blank=True)
 
     class Meta:

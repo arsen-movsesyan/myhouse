@@ -5,12 +5,13 @@ from django.contrib.auth.models import User
 
 from django.contrib.auth.decorators import login_required
 
-from datetime import date
+from datetime import date,datetime
 #from myhouse.models import MapUserHousehold
 from people.forms import AddEditUserForm
-from people.models import HouseUser,MapUserHousehold
+from people.models import HouseUser,MapUserHousehold,UserDocument,UserDocAttribute
 
 from config.models import DocumentType,DocumentAttribute,MapDocumentAttribute
+from config.forms import DynamicForm
 
 from account.models import Account,AccountUserPermission
 from account.forms import AccessFormSet
@@ -242,6 +243,13 @@ def view_person(request,in_user_id):
     context = dict()
     context['username'] = request.session['user_name']
     context['view_user'] = view_user
+    tw_docs = view_user.get_timewatch_documents()
+#    for tw in tw_docs:
+#	print tw['doc'].document.document_type
+#	print tw['attr'].attribute.attribute
+#	print tw['value']
+	#expired = date(tw['value'])
+    context['tw_docs'] = tw_docs
     context['ssn'] = view_user.get_complete_ssn()
     return HttpResponse(template.render(context))
 
@@ -255,6 +263,7 @@ def manage_documents(request,in_user_id):
     context['view_user'] = view_user
     avail_docs = DocumentType.objects.all()
     context['avail_docs'] = avail_docs
+    context['my_docs'] = view_user.userdocument_set.all()
     context['username'] = request.session['user_name']
     return HttpResponse(template.render(context))
 
@@ -262,7 +271,54 @@ def manage_documents(request,in_user_id):
 @login_required
 def assign_document(request,in_user_id,in_doc_id):
     assign_user = HouseUser.objects.get(pk=in_user_id)
-    assign_doc = DocumentType.objects.get(pk=in_doc_id)
+    doc_type = DocumentType.objects.get(pk=in_doc_id)
+    attributes = DocumentAttribute.objects.raw("""
+SELECT
+da.id
+,da.attribute
+,da.attribute_format
+FROM mh_1_config_document_type dt
+JOIN mh_1_config_map_doc_attribute map ON dt.id=map.doc_type_id
+JOIN mh_1_config_document_attribute da ON da.id=map.attr_id
+WHERE map.attached
+AND dt.id={0}""".format(in_doc_id)) # !!!! SQL injection hole !!!
+
+	
+    in_form_fields = []
+    for attrs in attributes:
+	f_set = dict()
+	f_set['id'] = attrs.id
+	f_set['f_name'] = attrs.attribute
+	f_set['f_format'] = attrs.attribute_format
+	in_form_fields.append(f_set)
+
     if request.method == 'POST':
-	return HttpResponseRedirect("/people/view/documents/"+in_user_id+"/")
+	in_form = DynamicForm(request.POST,fields=in_form_fields)
+	if in_form.is_valid():
+	    new_doc = UserDocument.objects.create(
+		user=assign_user,
+		document=doc_type
+	    )
+	    for name, value in in_form.cleaned_data.items():
+		if name.startswith('id_'):
+		    ref_name = name[3:]
+		    attr_id = value
+		    attribute = DocumentAttribute.objects.get(pk=attr_id)
+		    attr_value = in_form.cleaned_data[ref_name]
+#		    print "ID for {0} is {1} Value is {2}".format(ref_name,attr_id,attr_value)
+		    doc_attribute = UserDocAttribute.objects.create(
+			doc_map=new_doc,
+			attribute=attribute,
+			attr_value=attr_value
+		    )
+	    return HttpResponseRedirect("/people/view/documents/"+in_user_id+"/")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    in_form = DynamicForm(fields=in_form_fields)
     template = "people/assign_document.html"
+    context = {'form':in_form}
+    context['assign_user'] = assign_user
+    context['doc_type'] = doc_type
+    context['username'] = request.session['user_name']
+    return render(request,template,context)

@@ -39,7 +39,7 @@ class AddDocumentAttributeForm(ModelForm):
 
     class Meta:
 	model = DocumentAttribute
-	fields = ['attribute','attribute_format']
+	fields = ['attribute','attribute_format','time_watch']
 
 
 class MapDoctypeAttributeForm(forms.Form):
@@ -49,3 +49,32 @@ class MapDoctypeAttributeForm(forms.Form):
     attached = forms.BooleanField(required=False)
 
 DoctypeAttributeMapFormSet = formset_factory(MapDoctypeAttributeForm,extra=0)
+
+
+class DynamicForm(forms.Form):
+
+    def __init__(self,*args,**kwargs):
+	fields = kwargs.pop('fields')
+	super(DynamicForm,self).__init__(*args,**kwargs)
+	for f_set in fields:
+	    f_name = None
+	    f_type = None
+	    initial = None
+	    for k,v in f_set.iteritems():
+		if k == 'f_name':
+		    f_name = v
+		if k == 'f_format':
+		    f_type = v
+		if k == 'id':
+		    initial = v
+	    self._add_field(f_name,f_type,initial)
+
+
+    def _add_field(self,in_field_name,in_type,in_value=None):
+	if in_type == 'DATE':
+	    self.fields["%s" % in_field_name] = forms.DateField(label=in_field_name)
+	elif in_type == 'INTEGER':
+	    self.fields["%s" % in_field_name] = forms.IntegerField()
+	elif in_type == 'STRING':
+	    self.fields["%s" % in_field_name] = forms.CharField(max_length=255,label=in_field_name)
+	self.fields["id_%s" % in_field_name] = forms.CharField(widget=forms.HiddenInput,initial=in_value)
