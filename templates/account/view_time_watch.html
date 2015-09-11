@@ -1,0 +1,57 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "account/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+Time Watch<br><br>
+
+<table border="1">
+    <tr>
+	<td><b>Account Name</b></td>
+	<td><b>Visit Site</b></td>
+	<td><b>Due Date</b></td>
+	<td><b>Days Left</b></td>
+	<td><b>Acknowledge</b></td>
+	<td><b>History</b></td>
+    </tr>
+
+{% for acct in accounts %}
+    <tr>
+	<td><a class="noticable" href="view/{{ acct.obj.id }}">{{ acct.obj.acct_name }}</a></td>
+	<td>{{ acct.obj.login_url }}</td>
+{#	<td align="center">{{ acct.obj.t_watch.due_month_day }}</td> #}
+	<td align="center">{{ acct.due_date }}</td>
+	<td align="center" bgcolor=
+{% if acct.auto_payment %}
+	"#ffffff"
+{% else %}
+	"{{ acct.color }}"
+{% endif %}
+	>{{ acct.days_left }}</td>
+	<td class="wide">
+{% if acct.auto_payment %}
+	Auto Payment
+{% else %}
+    {% if acct.show_payment %}
+	<a href="acknowledge/{{ acct.obj.id }}">Acknowledge</a>
+    {% else %}
+	No Payment Needed
+    {% endif %}
+{% endif %}
+	</td>
+	<td><a href="history/{{ acct.obj.id }}">List Payments</a>
+    </tr>
+
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

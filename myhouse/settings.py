@@ -33,14 +33,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-#    'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account',
+    'people',
     'config',
+    'vehicle',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -114,3 +116,8 @@ STATICFILES_DIRS = (
 
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
+
+DURATIONFIELD_ALLOW_MONTHS = True
+
+WARNING_DAYS_LEFT = 12
+CRITICAL_DAYS_LEFT = 7

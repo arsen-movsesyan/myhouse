@@ -2,324 +2,313 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 
 from datetime import date
 
-
-
-from account.forms import CreateUserForm,LoginUserForm,AddEditUserForm,AddressForm
-from account.forms import AddEditAccountForm
-
-from account.models import HouseUser,BasicAddress,Household,MapUserHousehold,Account
+from account.forms import AddEditAccountForm,TimeWatchForm,AccessFormSet,AccountPaymentForm
+from account.forms import AccountAttributeValueForm
+from account.models import Account,AccountUserPermission,AccountTimeWatch,AccountPaymentHistory
+from account.models import AccountAttributeValue
 from config.models import AccountType
+from people.models import HouseUser
 
-
-def _index(request):
-    template=loader.get_template('account/index.html')
-    context={}
-    return HttpResponse(template.render(context))
-
-
-def self_register(request):
-    if request.method == 'POST':
-	in_form=CreateUserForm(request.POST)
-	if in_form.is_valid():
-	    email = in_form.cleaned_data['email']
-	    username = email
-	    password = in_form.cleaned_data['password']
-	    auth_user = User.objects.create_user(
-		username,
-		email,
-		password
-	    )
-	    ssn=in_form.cleaned_data['complete_ssn']
-	    household_user = HouseUser.objects.create(
-		auth_user = auth_user,
-		created_by = auth_user.id,
-		dob = in_form.cleaned_data['dob'],
-		sex = in_form.cleaned_data['sex'],
-		mh_superuser = True,
-		ssn_13 = ssn[0:3],
-		ssn_45 = ssn[4:6],
-		ssn_69 = ssn[7:11],
-		first_name = in_form.cleaned_data['first_name'],
-		last_name = in_form.cleaned_data['last_name'],
-		email = email,
-		title = in_form.cleaned_data['title'],
-		suffix = in_form.cleaned_data['suffix'],
-	    )
-	    household_user.save()
-	    user = authenticate(username=username, password=password)    
-	    login(request,user)
-	    return HttpResponseRedirect('account/')
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':in_form}))
-    else:
-	in_form = CreateUserForm()
-	template = 'account/register_user.html'
-	context = {'form':in_form}
-	return render(request,template,context)
-
-
-
-def log_in(request):
-    if request.method == 'POST':
-	user = authenticate(
-		username = request.POST['email'], 
-		password = request.POST['password'])
-	if user is not None:
-	    login(request,user)
-	    return HttpResponseRedirect('/account/')
-	else:
-	    return HttpResponse('Wrong Credentials')
-    else:
-	login_form = LoginUserForm()
-	template = 'account/login.html'
-	context = {'form':login_form}
-	return render(request,template,context)
-
-
-def log_out(request):
-    logout(request)
-    request.session.flush()
-    return HttpResponseRedirect('/')
 
 
 @login_required
-def user_home(request):
-    main_user = request.user
-    template = loader.get_template("account/home.html")
+def view_accounts(request,view_filter='active'):
+    house_user = request.user.house_user
+    template = loader.get_template("account/view_accounts.html")
     context = dict()
+    if view_filter == 'all':
+	accounts = Account.objects.filter(created_by=house_user)
+# Add all other with 'can_view' permission
+	context['view_method'] = 'all'
+    elif view_filter == 'active':
+	accounts = Account.objects.filter(created_by=house_user).filter(disabled = False)
+	context['view_method'] = 'active'
+    elif view_filter == 'time_watch':
+	accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
+	context['view_method'] = 'time_watch'
+    context['all_accounts'] = accounts
+    context['username'] = request.session['user_name']
     return HttpResponse(template.render(context))
 
-
-
 @login_required
-def edit_profile(request):
-    main_user = request.user.house_user
-    if request.method == 'POST':
-	in_form = AddEditUserForm(request.POST)
+def view_account(request,in_acct_id):
+    in_form = AccountAttributeValueForm(request.POST or None)
+    account = Account.objects.get(pk=in_acct_id)
+    if request.method =='POST':
 	if in_form.is_valid():
-
-	    if main_user.first_name != in_form.cleaned_data['first_name']:
-		main_user.first_name = in_form.cleaned_data['first_name']
-	    if main_user.last_name != in_form.cleaned_data['last_name']:
-		main_user.last_name = in_form.cleaned_data['last_name']
-	    if house_user.dob != in_form.cleaned_data['dob']:
-		house_user.dob = in_form.cleaned_data['dob']
-	    if house_user.sex != in_form.cleaned_data['sex']:
-		house_user.sex = in_form.cleaned_data['sex']
-
-	    house_user.save()
-	    return HttpResponseRedirect("/account")
+	    attribute = in_form.cleaned_data['attribute']
+	    value = in_form.cleaned_data['value']
+	    new_attr = AccountAttributeValue.objects.create(
+		account = account,
+		attribute = attribute,
+		value = value
+	    )
+#	    print in_form.cleaned_data
+	    return HttpResponseRedirect("/account/view/"+in_acct_id)
 	else:
-	    template = loader.get_template('account/err_template.html')
+	    template = loader.get_template('base/err_template.html')
 	    return HttpResponse(template.render({'form':in_form}))
-    else:
-	template = 'account/edit_profile.html'
-	context = dict()
-	my_ssn = main_user.get_complete_ssn(clear=False)
-	in_form = AddEditUserForm(instance=main_user,
-	    initial={'login_enabled':True,'complete_ssn':my_ssn})
-	context['user'] = main_user
-	context['form'] = in_form
-	return render(request,template,context)
 
-
-@login_required
-def view_household(request):
-    main_user=request.user.house_user
-
-    if request.method == 'POST':
-	hh_form = AddressForm(request.POST)
-	if hh_form.is_valid():
-	    new_address = BasicAddress.objects.create(
-		str_line_1 = hh_form.cleaned_data['str_line_1'],
-		str_line_2 = hh_form.cleaned_data['str_line_2'],
-		city = hh_form.cleaned_data['city'],
-		state = hh_form.cleaned_data['state'],
-		zip_code = hh_form.cleaned_data['zip_code'],
-		country = hh_form.cleaned_data['country'],
-		appt_unit = hh_form.cleaned_data['appt_unit'],
-	    )
-	    my_household = Household.objects.create(
-		ba_id = new_address
-	    )
-	    map_user = MapUserHousehold.objects.create(
-		user = main_user,
-		household = my_household
-	    )
-	    request.session['household'] = my_household.id
-	    return HttpResponseRedirect("/account")
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':hh_form}))
-    else:
-	context = dict()
-	if hasattr(main_user,'to_household'):
-	    household = main_user.to_household.household
-	    hh_address = household.ba
-	    hh_form = AddressForm(instance=hh_address)
-	    context['hh_address'] = hh_address
-	    request.session['household'] = household.id
-	else:
-	    hh_form = AddressForm()
-
-	template = 'account/create_household.html'
-	context['form'] = hh_form
-	context['user'] = main_user
-	return render(request,template,context)
-
-
-@login_required
-def view_persons(request):
-    main_user=request.user.house_user
-    all_persons = HouseUser.objects.filter(created_by=request.user.id).filter(disabled = False)
-    template = loader.get_template('account/view_users.html')
+    template = "account/view_account.html"
+    
     context=dict()
-    context['persons'] = all_persons
-#    for person in all_persons:
-#	print "#################################"
-#	for attr in dir(person):
-#	    print attr
-    return HttpResponse(template.render(context))
+    attributes = account.attributes.all()
+    context['account'] = account
+    context['attributes'] = attributes
+    context['form'] = in_form
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
 
 
 @login_required
-def view_addresses(request):
-    template = loader.get_template('account/view_addresses.html')
-    return HttpResponse(template.render())
-
-
-@login_required
-def add_person(request):
-    if request.method == 'POST':
-	in_form = AddEditUserForm(request.POST)
-	if in_form.is_valid():
-	    email = in_form.cleaned_data['email']
-	    username = email
-#	    First time password
-	    password = 'test123'
-	    auth_user = User.objects.create_user(
-		username,
-		email,
-		password
-	    )
-	    auth_user.is_active = in_form.cleaned_data['login_enabled']
-	    auth_user.save()
-	    ssn=in_form.cleaned_data['complete_ssn']
-	    household_user = HouseUser.objects.create(
-		auth_user = auth_user,
-		created_by = request.user.id,
-		dob = in_form.cleaned_data['dob'],
-		sex = in_form.cleaned_data['sex'],
-		mh_superuser = in_form.cleaned_data['mh_superuser'],
-		ssn_13 = ssn[0:3],
-		ssn_45 = ssn[4:6],
-		ssn_69 = ssn[7:11],
-		first_name = in_form.cleaned_data['first_name'],
-		last_name = in_form.cleaned_data['last_name'],
-		email = email,
-		title = in_form.cleaned_data['title'],
-		suffix = in_form.cleaned_data['suffix'],
-	    )
-	    household_user.save()
-	    return HttpResponseRedirect("user_management")
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':hh_form}))
-
-    else:
-	template = "account/add_edit_user.html"
-	in_form = AddEditUserForm(initial={'login_enabled':True})
-	return render(request,template,{'form':in_form})
-
-
-
-@login_required
-def edit_person(request,in_user_id):
-    auth_user = User.objects.get(pk=in_user_id)
-    household_user = auth_user.house_user
-    if request.method == 'POST':
-	in_form = AddEditUserForm(request.POST)
-	if in_form.is_valid():
-#	    email = in_form.cleaned_data['email']
-#	    username = email
-
-	    auth_user.email = in_form.cleaned_data['email']
-	    auth_user.username = in_form.cleaned_data['email']
-	    auth_user.is_active = in_form.cleaned_data['login_enabled']
-	    auth_user.save()
-
-	    ssn=in_form.cleaned_data['complete_ssn']
-	    household_user.dob = in_form.cleaned_data['dob'],
-	    household_user.sex = in_form.cleaned_data['sex'],
-	    household_user.mh_superuser = in_form.cleaned_data['mh_superuser'],
-	    household_user.ssn_13 = ssn[0:3],
-	    household_user.ssn_45 = ssn[4:6],
-	    household_user.ssn_69 = ssn[7:11],
-	    household_user.first_name = in_form.cleaned_data['first_name'],
-	    household_user.last_name = in_form.cleaned_data['last_name'],
-	    household_user.email = email,
-	    household_user.title = in_form.cleaned_data['title'],
-	    household_user.suffix = in_form.cleaned_data['suffix'],
-	    
-	    household_user.save()
-	    return HttpResponseRedirect("/account/user_management")
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':in_form}))
-
-    else:
-	template = "account/add_edit_user.html"
-	in_form = AddEditUserForm(instance=household_user,
-	    initial={'login_enabled':auth_user.is_active,
-		    'complete_ssn':household_user.get_complete_ssn(clear=False)})
-	return render(request,template,{'form':in_form})
-
-
-@login_required
-def delete_person(request,in_user_id):
-    auth_user = User.objects.get(pk=in_user_id)
-    household_user = auth_user.house_user
-    household_user.disabled = True
-    household_user.disabled_at = date.today()
-    household_user.save()
-    return HttpResponseRedirect("/account/user_management")
-
-@login_required
-def view_accounts(request):
-    template = loader.get_template("account/manage_accounts.html")
-    accounts = Account.objects.all()
-    context = {'all_accounts':accounts}
-    return HttpResponse(template.render(context))
+def account_attribute_delete(request,in_acct_id,in_attr_map_id):
+    attr_map = AccountAttributeValue.objects.get(pk=in_attr_map_id)
+    attr_map.delete()
+    return HttpResponseRedirect("/account/view/{0}".format(in_acct_id))
 
 
 
 @login_required
 def add_account(request):
+    main_user = request.user.house_user
+    other = main_user.get_other_users()
     if request.method == 'POST':
 	in_form = AddEditAccountForm(request.POST)
-	if in_form.is_valid():
-#	    acct_type = AccountType.objects.get(pk=in_form.cleaned_data['acct_type'])
-	    acct_type = AccountType.objects.get(type_name=in_form.cleaned_data['acct_type'])
+	access_formset = AccessFormSet(request.POST)
+	if access_formset.is_valid() and in_form.is_valid():
 	    new_acct = Account.objects.create(
 		acct_name = in_form.cleaned_data['acct_name'],
 		login_url = in_form.cleaned_data['login_url'],
-		created_by = request.user.id,
-		acct_type = acct_type
+		created_by = request.user.house_user,
+		acct_type = in_form.cleaned_data['acct_type'],
 	    )
-	    return HttpResponseRedirect("/account/account_management")
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':in_form}))
+	    if 'access_login' in in_form.cleaned_data:
+		new_acct.access_login = in_form.cleaned_data['access_login']
+	    if 'access_password' in in_form.cleaned_data:
+		new_acct.access_password = in_form.cleaned_data['access_password']
+	    if 'brief' in in_form.cleaned_data:
+		new_acct.brief = in_form.cleaned_data['brief']
+	    if 'description' in in_form.cleaned_data:
+		new_acct.description = in_form.cleaned_data['description']
+	    new_acct.save()
 
-    
+	    for access_form in access_formset:
+		user_pk = int(access_form.cleaned_data['user_id'])
+		can_edit = access_form.cleaned_data['can_edit']
+		can_view = access_form.cleaned_data['can_view']
+		can_manage = access_form.cleaned_data['can_manage']
+
+		access_user = HouseUser.objects.get(pk=user_pk)
+		access_map = AccountUserPermission.objects.create(
+		    account = new_acct,
+		    user = access_user,
+		    can_view = can_view,
+		    can_manage = can_manage,
+		    can_edit =can_edit
+		)
+	    return HttpResponseRedirect("/account/")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
     template = "account/add_edit_account.html"
     in_form = AddEditAccountForm()
-    context = {'form':in_form}
+    tw_form = TimeWatchForm()
+    init_formset_data = []
+    
+    for person in other:
+
+#########################
+# First field is made by VoidWidget to display username AS part of form
+#########################
+	init_form_data={
+	    'id':None,
+	    'user_name':person.user, # This is for display purposes
+	    'user_id':person.user.pk,
+	    'can_view':True,
+	    'can_manage':True,
+	    'can_edit':False}
+	init_formset_data.append(init_form_data)
+    access_formset = AccessFormSet(initial=init_formset_data)
+    context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
+    context['action'] = 'add'
+    context['username'] = request.session['user_name']
     return render(request,template,context)
+
+
+
+
+@login_required
+def edit_account(request,in_acct_id):
+    account_obj = Account.objects.get(pk=in_acct_id)
+    main_user = request.user.house_user
+    other = main_user.get_other_users()
+    if request.method == 'POST':
+	in_form = AddEditAccountForm(request.POST)
+#	tw_form = TimeWatchForm(request.POST)
+	access_formset = AccessFormSet(request.POST)
+	if access_formset.is_valid() and in_form.is_valid():
+	    account_obj.acct_name = in_form.cleaned_data['acct_name']
+	    account_obj.login_url = in_form.cleaned_data['login_url']
+	    account_obj.acct_type = in_form.cleaned_data['acct_type']
+
+	    if 'access_login' in in_form.cleaned_data:
+		account_obj.access_login = in_form.cleaned_data['access_login']
+	    if 'access_password' in in_form.cleaned_data:
+		account_obj.access_password = in_form.cleaned_data['access_password']
+	    if 'brief' in in_form.cleaned_data:
+		account_obj.brief = in_form.cleaned_data['brief']
+	    if 'description' in in_form.cleaned_data:
+		account_obj.description = in_form.cleaned_data['description']
+	    if 'disabled' in in_form.cleaned_data:
+		account_obj.description = in_form.cleaned_data['disabled']
+	    account_obj.save()
+
+	    for access_form in access_formset:
+		access_map_pk = int(access_form.cleaned_data['id'])
+		can_edit = access_form.cleaned_data['can_edit']
+		can_view = access_form.cleaned_data['can_view']
+		can_manage = access_form.cleaned_data['can_manage']
+
+		access_map = AccountUserPermission.objects.get(pk=access_map_pk)
+		access_map.can_view = can_view
+		access_map.can_manage = can_manage
+		access_map.can_edit = can_edit
+		access_map.save()
+	    return HttpResponseRedirect("/account/")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    template = "account/add_edit_account.html"
+    in_form = AddEditAccountForm(instance=account_obj)
+    tw_form = TimeWatchForm()
+    init_formset_data = []
+
+    for person in other:
+	house_user = person.user
+	access_map = AccountUserPermission.objects.filter(account=account_obj).get(user=house_user)
+
+#########################
+# First field is made by VoidWidget to display username AS part of form
+#########################
+	init_form_data = {
+	    'id':access_map.pk,
+	    'user_name':house_user, # This is for display purposes
+	    'user_id':house_user.pk,
+	    'can_view':access_map.can_view,
+	    'can_manage':access_map.can_manage,
+	    'can_edit':access_map.can_edit}
+	init_formset_data.append(init_form_data)
+    access_formset = AccessFormSet(initial=init_formset_data)
+    context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
+    context['action'] = 'edit'
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
+
+
+@login_required
+def delete_account(request,in_acct_id):
+    acct_to_delete = Account.objects.get(pk=in_acct_id)
+    acct_to_delete.delete()
+    return HttpResponseRedirect("/account/")
+
+
+@login_required
+def view_time_watch(request):
+    house_user = request.user.house_user
+    template = loader.get_template("account/view_time_watch.html")
+    ret_array = []
+    accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
+    for acct_obj in accounts:
+	if acct_obj.t_watch.disabled:
+	    continue
+	info = dict()
+	info['obj'] = acct_obj
+	d_d_d=acct_obj.t_watch.get_due_date()
+	info['due_date'] = d_d_d['due_date']
+	info['days_left'] = d_d_d['days_left']
+	info['show_payment'] = d_d_d['show_payment']
+	info['auto_payment'] = d_d_d['auto_payment']
+	info['color'] = d_d_d['color']
+	ret_array.append(info)
+
+
+    context = {'accounts':ret_array}
+    context['username'] = request.session['user_name']
+    return HttpResponse(template.render(context))
+
+
+@login_required
+def make_time_watch(request,in_acct_id):
+    edit_account = Account.objects.get(pk=in_acct_id)
+    if request.method == 'POST':
+	in_form = TimeWatchForm(request.POST)
+	if in_form.is_valid():
+	    if edit_account.time_watch == True:
+		new_time_watch = edit_account.t_watch
+		new_time_watch.disabled = in_form.cleaned_data['disabled']
+		new_time_watch.auto_payment = in_form.cleaned_data['auto_payment']
+	    else:
+		edit_account.time_watch = True
+		edit_account.save()
+		new_time_watch = AccountTimeWatch.objects.create(
+		    account = edit_account,
+		    auto_payment = in_form.cleaned_data['auto_payment']
+		)
+	    if 'month_frequency' in in_form.cleaned_data:
+		new_time_watch.month_frequency = in_form.cleaned_data['month_frequency']
+	    if 'due_month_day' in in_form.cleaned_data:
+		new_time_watch.due_month_day = in_form.cleaned_data['due_month_day']
+	    if 'initial_payment_date' in in_form.cleaned_data:
+		new_time_watch.initial_payment_date = in_form.cleaned_data['initial_payment_date']
+	    new_time_watch.save()
+
+	    return HttpResponseRedirect("/account/")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    template = "account/make_timewatch.html"    
+    in_form = TimeWatchForm(instance=edit_account.t_watch)
+    context = {'form':in_form}
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
+
+
+@login_required
+def acknowledge(request,in_acct_id):
+    account = AccountTimeWatch.objects.get(pk=in_acct_id)
+    if request.method == 'POST':
+	in_form = AccountPaymentForm(request.POST)
+	if in_form.is_valid():
+	    payment_history = AccountPaymentHistory.objects.create(
+		account=account,
+		payment_date=in_form.cleaned_data['payment_date'],
+		skip=in_form.cleaned_data['skip']
+	    )
+	    if in_form.cleaned_data['skip']:
+		payment_history.confirmation_code = 'Void Acknowledged'
+	    else:
+		payment_history.confirmation_code = in_form.cleaned_data['confirmation_code']
+		payment_history.payment_amount = in_form.cleaned_data['payment_amount']
+	    payment_history.save() 
+	    return HttpResponseRedirect("/account/view_time_watch")
+	else:
+	    template = loader.get_template('base/err_template.html')
+	    return HttpResponse(template.render({'form':in_form}))
+    template = "account/acknowledge.html"
+    in_form = AccountPaymentForm()
+    context = {'account':account,'form':in_form}
+    context['username'] = request.session['user_name']
+    return render(request,template,context)
+
+
+@login_required
+def view_payment_history(request,in_acct_id):
+    account = AccountTimeWatch.objects.get(pk=in_acct_id)
+    payments = account.payment_history.all()
+    template = loader.get_template("account/view_payment_history.html")
+    context = {'account':account,'payments':payments}
+    return HttpResponse(template.render(context))

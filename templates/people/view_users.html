@@ -1,0 +1,48 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "people/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "people/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+<br><br>
+
+<table border="1">
+    <tr>
+	<td>First Name</td>
+	<td>Last Name</td>
+	<td>DOB</td>
+	<td>SSN</td>
+	<td>Can Login</td>
+{% if house_user.user_map.hh_superuser %} 
+	<td>Actions</td>
+{% endif %}
+{% for person in persons %}
+    <tr>
+	<td><a class="noticable" href="view/{{ person.user_id }}">{{ person.user.first_name }}</a></td>
+	<td>{{ person.user.last_name }}</td>
+	<td>{{ person.user.dob }}</td>
+	<td>{{ person.user.ssn_13 }}</td>
+	<td>{{ person.user.auth_user.is_active }}</td>
+{% if house_user.user_map.hh_superuser %}
+	<td>
+	{% if person.user == house_user %}
+	    &nbsp;
+	{% else %}
+	    <a href="edit/{{ person.user.auth_user_id }}">Edit</a>
+	    <a href="delete/{{ person.user.auth_user_id }}">Delete</a>
+	{% endif %}
+	</td>
+{% endif %}
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {% include "base/block_right_pan.html" %}
+{% endblock %}

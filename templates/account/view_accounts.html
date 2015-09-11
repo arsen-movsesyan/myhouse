@@ -1,0 +1,50 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "account/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+Account management<br><br>
+
+<table border="1">
+    <tr>
+	<td><b>Account Name</b></td>
+	<td><b>Type</b></td>
+	<td><b>Brief Description</b></td>
+	<td><b>Created</b></td>
+{#	<td><b>Owner</b></td> #}
+	<td><b>Visit Site</b></td>
+{% if view_method == "all" %}
+	<td><b>Disabled</b></td>
+	<td><b>Inactive since</b></td>
+{% endif %}
+	<td><b>Actions</b></td>
+    </tr>
+{% for acct in all_accounts %}
+    <tr>
+	<td><a class="noticable" href="view/{{ acct.id }}">{{ acct.acct_name }}</a></td>
+	<td>{{ acct.acct_type }}</td>
+	<td>{{ acct.brief }}</td>
+	<td>{{ acct.create_date }}</td>
+	<td><a href="{{ acct.login_url }}" target="_blank">Opens in new tab</a></td>
+{% if view_method == "all" %}
+	<td>{{ acct.disabled }}</b></td>
+	<td>{{ acct.disabled_date }}</td>
+{% endif %}
+	<td><a href="edit/{{ acct.id }}">Edit</a>
+	    <a href="delete/{{ acct.id }}">Delete</a>
+	    <a href="time_watch/{{ acct.id }}">Time Watch</a></td>
+    </tr>
+
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

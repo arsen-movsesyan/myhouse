@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "base/block_config.html" %}
+{% endblock %}
+
+{% block search %}
+{% endblock %}
+
+
+
+{% block main_menu %}{% endblock %}
+{% block main_info %}
+
+{% for field in form %}
+
+    {% if field.errors %}
+	{{ field.label_tag }} {{ field.errors }}
+    {% endif %}
+
+{% endfor %}
+
+{% endblock %}

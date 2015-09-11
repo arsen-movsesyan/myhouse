@@ -1,8 +1,13 @@
 from django import forms
-from django.forms import ModelForm
-from django.contrib.auth.models import User
+from django.forms import ModelForm,Widget
+from django.forms.formsets import formset_factory
 
-from config.models import AccountType
+from config.models import AccountType,AccountAttribute,VehicleType,DocumentType,DocumentAttribute
+
+class VoidWidget(Widget):
+
+    def render(self,name,value,attrs=None):
+	return value
 
 
 class AddEditAccountTypeForm(ModelForm):
@@ -11,86 +16,65 @@ class AddEditAccountTypeForm(ModelForm):
 	model = AccountType
 	fields = ['type_name','brief','description']
 
-"""
-
-
-class CreateUserForm(ModelForm):
-    password = forms.CharField(label='Password',widget=forms.PasswordInput)
-    confirm_password = forms.CharField(label='Confirm Password',widget=forms.PasswordInput)
-    confirm_email = forms.CharField(label='Confirm email')
-    complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
+class AddAccountAttributeForm(ModelForm):
 
     class Meta:
-	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','sex','email','dob']
+	model = AccountAttribute
+	fields = ['attribute_name','description']
 
-    def clean(self):
-	cleaned_data = super(CreateUserForm,self).clean()
-
-	if 'complete_ssn' in cleaned_data:
-	    complete_ssn = cleaned_data['complete_ssn']
-	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
-		self.add_error('complete_ssn',"Invalid ssn provided")
-
-	if 'password' in cleaned_data and 'confirm_password' in cleaned_data:
-	    password = cleaned_data['password']
-	    confirm_password = cleaned_data['confirm_password']
-	    if password != confirm_password:
-		self.add_error('confirm_password', "Password Confirmation mismatch")
-	if 'email' in cleaned_data and 'confirm_email' in cleaned_data:
-	    email = cleaned_data['email']
-	    confirm_email = cleaned_data['confirm_email']
-	    if email != confirm_email:
-		self.add_error('confirm_email', "Email Confirmation mismatch")
-
-
-
-class LoginUserForm(ModelForm):
-#    email = forms.CharField(label='Email')
-    password = forms.CharField(label='Password',widget=forms.PasswordInput)
-    class Meta:
-	model = User
-	fields = ['email','password']
-
-"""
-"""
-class EditUserForm(ModelForm):
+class AddVehicleTypeForm(ModelForm):
 
     class Meta:
-	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','dob','sex','email']
+	model = VehicleType
+	fields = ['vehicle_type','description']
 
-    def clean(self):
-	cleaned_data = super(HouseUserForm,self).clean()
-
-	if 'complete_ssn' in cleaned_data:
-	    complete_ssn = cleaned_data['complete_ssn']
-	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
-		self.add_error('complete_ssn',"Invalid ssn provided")
-"""
-
-"""
-class AddressForm(ModelForm):
+class AddDocumentTypeForm(ModelForm):
 
     class Meta:
-	model = BasicAddress
-	fields = ['str_line_1','str_line_2','appt_unit','city','state','zip_code','country']
+	model = DocumentType
+	fields = ['document_type','description']
 
 
-class AddEditUserForm(ModelForm):
-    login_enabled = forms.BooleanField(required=True)
-    complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
+class AddDocumentAttributeForm(ModelForm):
 
     class Meta:
-	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','dob','sex','email','mh_superuser']
+	model = DocumentAttribute
+	fields = ['attribute','attribute_format','time_watch']
 
-    def clean(self):
-	cleaned_data = super(AddEditUserForm,self).clean()
 
-	if 'complete_ssn' in cleaned_data:
-	    complete_ssn = cleaned_data['complete_ssn']
-	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
-		self.add_error('complete_ssn',"Invalid ssn provided")
+class MapDoctypeAttributeForm(forms.Form):
+    map_id = forms.CharField(widget=forms.HiddenInput,required=False)
+    attribute_name = forms.CharField(widget=VoidWidget,required=False)
+    attr_id = forms.CharField(widget=forms.HiddenInput,required=False)
+    attached = forms.BooleanField(required=False)
 
-"""
+DoctypeAttributeMapFormSet = formset_factory(MapDoctypeAttributeForm,extra=0)
+
+
+class DynamicForm(forms.Form):
+
+    def __init__(self,*args,**kwargs):
+	fields = kwargs.pop('fields')
+	super(DynamicForm,self).__init__(*args,**kwargs)
+	for f_set in fields:
+	    f_name = None
+	    f_type = None
+	    initial = None
+	    for k,v in f_set.iteritems():
+		if k == 'f_name':
+		    f_name = v
+		if k == 'f_format':
+		    f_type = v
+		if k == 'id':
+		    initial = v
+	    self._add_field(f_name,f_type,initial)
+
+
+    def _add_field(self,in_field_name,in_type,in_value=None):
+	if in_type == 'DATE':
+	    self.fields["%s" % in_field_name] = forms.DateField()
+	elif in_type == 'INTEGER':
+	    self.fields["%s" % in_field_name] = forms.IntegerField()
+	elif in_type == 'STRING':
+	    self.fields["%s" % in_field_name] = forms.CharField(max_length=255,label=in_field_name)
+	self.fields["id_%s" % in_field_name] = forms.CharField(widget=forms.HiddenInput,initial=in_value)

@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "people/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "people/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+
+<br><br>
+
+<table border="1">
+    <tr>
+	<td>
+
+
+<table border="1">
+    <tr>
+	<td>First Name</td>
+	<td>{{ view_user.first_name }}</td>
+    </tr><tr>
+	<td>Last Name</td>
+	<td>{{ view_user.last_name }}</td>
+    </tr><tr>
+	<td>Email</td>
+	<td>{{ view_user.email }}</td>
+    </tr><tr>
+	<td>DOB</td>
+	<td>{{ view_user.dob }}</td>
+    </tr><tr>
+	<td>SSN</td>
+	<td>{{ ssn }}</td>
+    </tr>
+</table>
+
+
+	</td><td>
+
+<table border="1">
+    <tr>
+	<td><a href="documents/{{ view_user.auth_user_id }}/">View Documents</a></td>
+    </tr><tr>
+	<td><a href="#">View Insurances</a></td>
+    </tr>
+</table>
+
+	</td>
+    </tr>
+</table>
+<br>
+All reminders and expirations here<br><br>
+<table border="1">
+    <tr>
+	<td>Event/Document</td>
+	<td>Exact Date</td>
+	<td>Days Left</td>
+	<td>Action</td>
+    </tr>
+{% for doc in tw_docs %}
+    <tr>
+	<td>{{ doc.doc.document.document_type }}</td>
+	<td>{{ doc.value }}</td>
+	<td>12345</td>
+	<td>Acknowledge</td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+
+{% block right_pan %}
+    {% include "base/block_right_pan.html" %}
+{% endblock %}

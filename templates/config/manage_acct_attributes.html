@@ -1,0 +1,38 @@
+
+{% extends "base/base.html" %}
+
+
+{% block config %}
+    {% include "config/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "config/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+
+<a href="/config/account/attributes/add">Add New Attribute</a>
+<br><br>
+
+<table border="1">
+    <tr align="center">
+	<td><b>Name</b></td>
+	<td><b>Description</b></td>
+    </tr>
+
+
+{% for attr in attributes %}
+    <tr>
+	<td>{{ attr.attribute_name }}</td>
+{#	<td><a class="noticable" href="edit/{{ acct_type.id }}">{{ attr.attribute_name }}</a></td> #}
+	<td>{{ attr.description }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+{% endblock %}

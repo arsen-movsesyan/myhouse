@@ -1,76 +1,61 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm,Widget
 from django.contrib.auth.models import User
 
-from account.models import HouseUser,BasicAddress,Account
+from django.forms.formsets import formset_factory
 
-import re
+from account.models import Account,AccountTimeWatch,AccountUserPermission,AccountPaymentHistory,AccountAttributeValue
+from people.models import HouseUser
 
+class VoidWidget(Widget):
 
-class CreateUserForm(ModelForm):
-    password = forms.CharField(label='Password',widget=forms.PasswordInput)
-    confirm_password = forms.CharField(label='Confirm Password',widget=forms.PasswordInput)
-    confirm_email = forms.CharField(label='Confirm email')
-    complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
+    def render(self,name,value,attrs=None):
+	return value
 
-    class Meta:
-	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','sex','email','dob']
-
-    def clean(self):
-	cleaned_data = super(CreateUserForm,self).clean()
-
-	if 'complete_ssn' in cleaned_data:
-	    complete_ssn = cleaned_data['complete_ssn']
-	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
-		self.add_error('complete_ssn',"Invalid ssn provided")
-
-	if 'password' in cleaned_data and 'confirm_password' in cleaned_data:
-	    password = cleaned_data['password']
-	    confirm_password = cleaned_data['confirm_password']
-	    if password != confirm_password:
-		self.add_error('confirm_password', "Password Confirmation mismatch")
-	if 'email' in cleaned_data and 'confirm_email' in cleaned_data:
-	    email = cleaned_data['email']
-	    confirm_email = cleaned_data['confirm_email']
-	    if email != confirm_email:
-		self.add_error('confirm_email', "Email Confirmation mismatch")
-
-
-
-class LoginUserForm(ModelForm):
-#    email = forms.CharField(label='Email')
-    password = forms.CharField(label='Password',widget=forms.PasswordInput)
-    class Meta:
-	model = User
-	fields = ['email','password']
-
-
-class AddressForm(ModelForm):
-
-    class Meta:
-	model = BasicAddress
-	fields = ['str_line_1','str_line_2','appt_unit','city','state','zip_code','country']
-
-
-class AddEditUserForm(ModelForm):
-    login_enabled = forms.BooleanField(required=True)
-    complete_ssn = forms.CharField(max_length=11,help_text="In form 'xxx-xx-xxxx'")
-
-    class Meta:
-	model = HouseUser
-	fields = ['title','first_name','last_name','suffix','dob','sex','email','mh_superuser']
-
-    def clean(self):
-	cleaned_data = super(AddEditUserForm,self).clean()
-
-	if 'complete_ssn' in cleaned_data:
-	    complete_ssn = cleaned_data['complete_ssn']
-	    if not re.match('^\d{3}-\d{2}-\d{4}$',complete_ssn):
-		self.add_error('complete_ssn',"Invalid ssn provided")
 
 class AddEditAccountForm(ModelForm):
 
     class Meta:
 	model = Account
-	fields = ['acct_name','login_url','acct_type']
+	fields = ['acct_name','login_url','brief','acct_type',
+	    'disabled','access_login','access_password','description']
+
+
+class TimeWatchForm(ModelForm):
+
+    class Meta:
+	model = AccountTimeWatch
+	fields = ['auto_payment','month_frequency','due_month_day','initial_payment_date','disabled']
+
+class AccountUserPermissionForm(ModelForm):
+    id = forms.CharField(widget=forms.HiddenInput,required=False)
+    user_name = forms.CharField(widget=VoidWidget,required=False)
+    account_name = forms.CharField(widget=VoidWidget,required=False)
+    user_id = forms.CharField(widget=forms.HiddenInput,required=False)
+    account_id = forms.CharField(widget=forms.HiddenInput,required=False)
+
+    class Meta:
+	model = AccountUserPermission
+	fields = ['id','can_view','can_manage','can_edit']
+
+
+#    def clean(self):
+#	cleaned_data = super(AccountUserPermissionForm,self).clean()
+#	house_user = HouseUser.objects.get(pk=cleaned_data['user'])
+#	cleaned_data['user'] = house_user
+
+class AccountPaymentForm(ModelForm):
+    skip = forms.BooleanField(required=False,label='Skip This Time')
+
+    class Meta:
+	model = AccountPaymentHistory
+	fields = ['payment_date','payment_amount','confirmation_code','skip']
+
+
+class AccountAttributeValueForm(ModelForm):
+
+    class Meta:
+	model = AccountAttributeValue
+	fields = ['attribute','value']
+
+AccessFormSet = formset_factory(AccountUserPermissionForm,extra=0)

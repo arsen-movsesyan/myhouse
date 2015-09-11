@@ -1,0 +1,60 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "vehicle/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "vehicle/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+<br>
+
+<table border="1">
+    <tr>
+	<td>
+
+<table border="1">
+    <tr>
+	<td>Make</td>
+	<td>{{ vehicle.make }}</td>
+    </tr><tr>
+	<td>Model</td>
+	<td>{{ vehicle.model }}</td>
+    </tr><tr>
+	<td>Year Produced</td>
+	<td>{{ vehicle.year_produced }}</td>
+    </tr><tr>
+	<td>VIN</td>
+	<td>{{ vehicle.vin }}</td>
+    </tr><tr>
+	<td>License Plate</td>
+	<td>{{ vehicle.license_plate }}</td>
+    </tr><tr>
+	<td>Non Operational</td>
+	<td>{{ vehicle.non_operational }}</td>
+    </tr>
+</table>
+
+	</td>
+	<td>
+
+<table border="1">
+    <tr>
+	<td>Attribute</td>
+	<td>Value</td>
+    </tr>
+
+
+
+</table>
+
+	</td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}

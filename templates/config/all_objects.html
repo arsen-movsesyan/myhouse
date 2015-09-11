@@ -1,0 +1,15 @@
+
+{% extends "base/base.html" %}
+
+
+{% block config %}
+    {% include "config/block_config.html" %}
+{% endblock %}
+
+{% block main_menu %}
+    {{ block.super }}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "config/block_navigate_menu.html" %}
+{% endblock %}

@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>Household</title>
+
+    {% load staticfiles %}
+    <link href="{% static 'styles.css' %}" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+
+<table border="1" class="main">
+    <tr>
+
+	<td class="logo">
+{% block Logo %}
+    {% include "base/block_logo.html" %}
+{% endblock %}</td>
+	<td class="top_info">
+{% block top_info %}
+    {% include "base/block_top_info.html" %}
+{% endblock %}</td>
+	<td class="config">
+{% block config %}
+    {% include "base/block_config.html" %}
+{% endblock %}</td>
+    </tr><tr>
+	<td class="search">
+{% block search %}
+    {% include "base/block_search.html" %}
+{% endblock %}</td>
+	<td class="top_menu">
+{% block main_menu %}
+    {% include "base/block_main_menu.html" %}
+{% endblock %}</td>
+	<td class="reserved">
+{% block reserved %}
+    {% include "base/block_reserved.html" %}
+{% endblock %}</td>
+    </tr><tr>
+	<td class="navigate">{% block navigate_menu %}Navigate{% endblock %}</td>
+	<td class="main_info">{% block main_info %}Main Info{% endblock %}</td>
+	<td class="right_pan">{% block right_pan %}
+    {% include "base/block_right_pan.html" %}
+{% endblock %}</td>
+    </tr><tr>
+	<td class="copyright">{% block copyright %}Copyright{% endblock %}</td>
+	<td class="bottom_stripe">{% block bottom %}Bottom Stripe{% endblock %}</td>
+	<td class="reserved_corner">{% block empty_corner %}Reserved Corner{% endblock %}</td>
+    </tr>
+</table>
+
+</body>
+</html>
+

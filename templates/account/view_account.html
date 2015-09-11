@@ -1,0 +1,72 @@
+{% extends "base/base.html" %}
+
+{% block config %}
+    {% include "account/block_config.html" %}
+{% endblock %}
+
+{% block navigate_menu %}
+    {% include "account/block_navigate_menu.html" %}
+{% endblock %}
+
+{% block main_info %}
+<br>
+
+<table border="1">
+    <tr>
+	<td>
+
+<table border="1">
+    <tr>
+	<td>Name</td>
+	<td>{{ account.acct_name }}</td>
+    </tr><tr>
+	<td>Type</td>
+	<td>{{ account.acct_type }}</td>
+    </tr><tr>
+	<td>URL</td>
+	<td>{{ account.login_url }}</td>
+    </tr><tr>
+	<td>Access Login</td>
+	<td>{{ account.access_login }}</td>
+    </tr><tr>
+	<td>Access Password</td>
+	<td>{{ account.access_password }}</td>
+    </tr>
+</table>
+
+	</td>
+	<td>
+
+<table border="1">
+    <tr>
+	<td>Attribute</td>
+	<td>Value</td>
+	<td>Action</td>
+    </tr>
+{% for attr in attributes %}
+    <tr>
+	<td>{{ attr.attribute }}</td>
+	<td>{{ attr.value }}</td>
+	<td><a href="/account/view/{{ account.id }}/attribute_delete/{{ attr.id }}">Delete</a></td>
+    </tr>
+{% endfor %}
+<form method="post">
+{% csrf_token %}
+    {{ form.as_table }}
+
+    <tr>
+	<td colspan=2 align="center">
+<input type="submit" value="Submit">
+	</td>
+    </tr>
+</form>
+</table>
+
+	</td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block right_pan %}
+    {{ block.super }}
+{% endblock %}
