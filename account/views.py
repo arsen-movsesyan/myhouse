@@ -31,7 +31,7 @@ def view_accounts(request,view_filter='active'):
 	accounts = Account.objects.filter(created_by=house_user).filter(disabled = False).filter(time_watch=True)
 	context['view_method'] = 'time_watch'
     context['all_accounts'] = accounts
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 @login_required
@@ -60,7 +60,7 @@ def view_account(request,in_acct_id):
     context['account'] = account
     context['attributes'] = attributes
     context['form'] = in_form
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -135,7 +135,7 @@ def add_account(request):
     access_formset = AccessFormSet(initial=init_formset_data)
     context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
     context['action'] = 'add'
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -205,7 +205,7 @@ def edit_account(request,in_acct_id):
     access_formset = AccessFormSet(initial=init_formset_data)
     context = {'form':in_form,'tw_form':tw_form,'access_formset':access_formset}
     context['action'] = 'edit'
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -237,7 +237,7 @@ def view_time_watch(request):
 
 
     context = {'accounts':ret_array}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -273,7 +273,7 @@ def make_time_watch(request,in_acct_id):
     template = "account/make_timewatch.html"    
     in_form = TimeWatchForm(instance=edit_account.t_watch)
     context = {'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -301,7 +301,7 @@ def acknowledge(request,in_acct_id):
     template = "account/acknowledge.html"
     in_form = AccountPaymentForm()
     context = {'account':account,'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 

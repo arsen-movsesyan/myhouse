@@ -23,7 +23,7 @@ def view_vehicles(request):
 #    vehicles = VehicleGeneric.objects.filter(created_by=house_user)
     vehicles = VehicleCar.objects.filter(owned_by=house_user)
     context['all_cars'] = vehicles
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -46,7 +46,7 @@ def view_time_watch(request):
 	ret_array.append(info)
 
     context['all_cars'] = ret_array
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -56,7 +56,7 @@ def view_vehicle(request,in_vehicle_id):
     template = loader.get_template("vehicle/view_vehicle.html")
     context=dict()
     context['vehicle'] = vehicle
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -119,7 +119,7 @@ def add_vehicle_car(request):
     operate_formset = OperateFormSet(initial=init_formset_data)
     context = {'form':in_form,'operate_formset':operate_formset}
     context['action'] = 'add'
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -168,7 +168,7 @@ def edit_vehicle_car(request,in_vehicle_id):
 	init_formset_data.append(init_form_data)
     operate_formset = OperateFormSet(initial=init_formset_data)
     context = {'form':in_form,'operate_formset':operate_formset}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -191,7 +191,7 @@ def renewal_acknowledge(request,in_vehicle_id):
     in_form = VehicleRenewalForm()
     context['form'] = in_form
     context['vehicle'] = vehicle
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 

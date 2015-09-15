@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'myhouse.wsgi.application'
 DATABASES = {
     'default': {
 	'ENGINE': 'django.db.backends.postgresql_psycopg2',
-	'NAME': 'myhouse',
+	'NAME': 'm_house',
 	'USER': 'postgres',
 	'HOST': 'localhost',
 	'PORT': 5432,

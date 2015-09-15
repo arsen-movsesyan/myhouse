@@ -19,7 +19,7 @@ from config.models import MapDocumentAttribute
 def view_all_objects(request):
     template = loader.get_template("config/all_objects.html")
     context = dict()
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -29,7 +29,7 @@ def manage_acct_type(request):
     context = dict()
     template = "config/manage_acct_types.html"
     context['types'] = acct_types
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -52,7 +52,7 @@ def add_acct_type(request):
     in_form = AddEditAccountTypeForm()
     template = "config/add_edit_acct_type.html"
     context = {'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 @login_required
@@ -74,7 +74,7 @@ def edit_acct_type(request,in_type_id):
     in_form = AddEditAccountTypeForm(instance=acct_type)
     template = "config/add_edit_acct_type.html"
     context = {'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -84,7 +84,7 @@ def manage_acct_attribute(request):
     context = dict()
     template = "config/manage_acct_attributes.html"
     context['attributes'] = attributes
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -104,7 +104,7 @@ def add_acct_attribute(request):
     in_form = AddAccountAttributeForm()
     template = "config/add_acct_attribute.html"
     context = {'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -115,7 +115,7 @@ def manage_vehicle_type(request):
     context = dict()
     template = "config/manage_vehicle_types.html"
     context['vehicle_types'] = vehicle_types
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -136,7 +136,7 @@ def add_vehicle_type(request):
     in_form = AddVehicleTypeForm()
     template = "config/add_acct_attribute.html"
     context = {'form':in_form}
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 @login_required
@@ -145,7 +145,7 @@ def manage_document_type(request):
     context = dict()
     template = "config/manage_document_types.html"
     context['document_types'] = document_types
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -187,7 +187,7 @@ def add_document_type(request):
     map_formset = DoctypeAttributeMapFormSet(initial=init_formset_data)
     context['form'] = in_form
     context['map_formset'] = map_formset
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -231,7 +231,7 @@ def edit_document_type(request,in_doc_type_id):
     map_formset = DoctypeAttributeMapFormSet(initial=init_formset_data)
     context['form'] = in_form
     context['map_formset'] = map_formset
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -241,7 +241,7 @@ def manage_doc_attribute(request):
     context = dict()
     template = "config/manage_doc_attribute.html"
     context['doc_attributes'] = doc_attributes
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -264,6 +264,6 @@ def add_doc_attribute(request):
     template = "config/add_document_attribute.html"
     context = {'form':in_form}
     context['doc_attributes'] = doc_attributes
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 

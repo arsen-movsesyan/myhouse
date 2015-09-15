@@ -60,6 +60,9 @@ def self_register(request):
 
 	    user = authenticate(username=username, password=password)    
 	    login(request,user)
+	    request.session['household_id'] = new_household.id
+	    request.session['username'] = user.house_user.first_name
+#	    print user.house_user.first_name
 	    return HttpResponseRedirect('account/')
 	else:
 	    template = loader.get_template('base/err_template.html')
@@ -82,7 +85,8 @@ def log_in(request):
 	    request.session['user_id'] = user.id
 	    household_id = user.house_user.user_map.household.id
 	    request.session['household_id'] = household_id
-	    request.session['user_name'] = user.house_user.first_name
+	    request.session['username'] = user.house_user.first_name
+#	    print user.house_user.first_name
 	    return HttpResponseRedirect('/account/')
 	else:
 	    return HttpResponse('Wrong Credentials')
@@ -98,48 +102,3 @@ def log_out(request):
     request.session.flush()
     return HttpResponseRedirect('/')
 
-"""
-@login_required
-def view_household(request):
-    main_user=request.user.house_user
-
-    if request.method == 'POST':
-	hh_form = AddressForm(request.POST)
-	if hh_form.is_valid():
-	    new_address = BasicAddress.objects.create(
-		str_line_1 = hh_form.cleaned_data['str_line_1'],
-		str_line_2 = hh_form.cleaned_data['str_line_2'],
-		city = hh_form.cleaned_data['city'],
-		state = hh_form.cleaned_data['state'],
-		zip_code = hh_form.cleaned_data['zip_code'],
-		country = hh_form.cleaned_data['country'],
-		appt_unit = hh_form.cleaned_data['appt_unit'],
-	    )
-	    my_household = Household.objects.create(
-		ba_id = new_address
-	    )
-	    map_user = MapUserHousehold.objects.create(
-		user = main_user,
-		household = my_household
-	    )
-	    request.session['household'] = my_household.id
-	    return HttpResponseRedirect("/account")
-	else:
-	    template = loader.get_template('account/err_template.html')
-	    return HttpResponse(template.render({'form':hh_form}))
-    else:
-	context = dict()
-	if hasattr(main_user,'to_household'):
-	    household = main_user.to_household.household
-	    hh_address = household.ba
-	    hh_form = AddressForm(instance=hh_address)
-	    context['hh_address'] = hh_address
-	    request.session['household'] = household.id
-	else:
-	    hh_form = AddressForm()
-
-	template = 'account/create_household.html'
-	context['form'] = hh_form
-	context['user'] = main_user
-	return render(request,template,context)
-"""

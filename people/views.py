@@ -51,7 +51,7 @@ def edit_profile(request):
 	'hh_superuser':house_user.user_map.hh_superuser,})
     context['user'] = house_user
     context['form'] = in_form
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -64,7 +64,7 @@ def view_persons(request):
     context=dict()
     context['persons'] = user_maps
     context['house_user'] = house_user
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -170,7 +170,7 @@ def add_person(request):
 
     context = {'form':in_form,'account_access_formset':account_access_formset}
     context['car_access_formset'] = car_access_formset
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -266,7 +266,7 @@ def edit_person(request,in_user_id):
     car_access_formset = OperateFormSet(initial=car_init_formset_data)
     context = {'form':in_form,'account_access_formset':account_access_formset}
     context['car_access_formset'] = car_access_formset
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
 
 
@@ -284,7 +284,7 @@ def view_person(request,in_user_id):
     view_user = HouseUser.objects.get(pk=in_user_id)
     template = loader.get_template("people/view_user.html")
     context = dict()
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     context['view_user'] = view_user
     tw_docs = view_user.get_timewatch_documents()
 #    for tw in tw_docs:
@@ -307,7 +307,7 @@ def manage_documents(request,in_user_id):
     avail_docs = DocumentType.objects.all()
     context['avail_docs'] = avail_docs
     context['my_docs'] = view_user.userdocument_set.all()
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return HttpResponse(template.render(context))
 
 
@@ -363,5 +363,5 @@ AND dt.id={0}""".format(in_doc_id)) # !!!! SQL injection hole !!!
     context = {'form':in_form}
     context['assign_user'] = assign_user
     context['doc_type'] = doc_type
-    context['username'] = request.session['user_name']
+    context['username'] = request.session['username']
     return render(request,template,context)
