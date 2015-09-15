@@ -45,7 +45,7 @@ def add_acct_type(request):
 	    if 'description' in in_form.cleaned_data:
 		new_type.description = in_form.cleaned_data['description']
 		new_type.save()
-	    return HttpResponseRedirect("/config/acct_type")
+	    return HttpResponseRedirect("/config/account/types")
 	else:
 	    template = loader.get_template('base/err_template.html')
 	    return HttpResponse(template.render({'form':in_form}))
